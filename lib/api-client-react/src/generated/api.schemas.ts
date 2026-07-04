@@ -19,6 +19,7 @@ export interface AuthUser {
   lastName: string | null;
   /** @nullable */
   profileImageUrl: string | null;
+  isOwner: boolean;
 }
 
 export interface AuthUserEnvelope {

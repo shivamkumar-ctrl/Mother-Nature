@@ -30,7 +30,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <Link href="/orders" className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/orders") ? "text-primary" : "text-muted-foreground"}`}>
                 Orders
               </Link>
-              {isAuthenticated && (
+              {user?.isOwner && (
                 <Link href="/admin" className="text-sm font-medium text-secondary hover:text-secondary/80 transition-colors">
                   Admin
                 </Link>
@@ -40,11 +40,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
-              <Button variant="ghost" onClick={() => logout()} className="text-sm font-medium hidden md:inline-flex">
+              <Button variant="ghost" onClick={() => logout()} className="text-sm font-medium">
                 Log out
               </Button>
             ) : (
-              <Button variant="ghost" onClick={() => login()} className="text-sm font-medium hidden md:inline-flex">
+              <Button variant="ghost" onClick={() => login()} className="text-sm font-medium">
                 Log in
               </Button>
             )}

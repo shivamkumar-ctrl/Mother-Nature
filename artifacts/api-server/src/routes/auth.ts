@@ -18,6 +18,7 @@ import {
   ISSUER_URL,
   type SessionData,
 } from "../lib/auth";
+import { isOwner } from "./products";
 
 const OIDC_COOKIE_TTL = 10 * 60 * 1000;
 
@@ -83,11 +84,10 @@ async function upsertUser(claims: Record<string, unknown>) {
 }
 
 router.get("/auth/user", (req: Request, res: Response) => {
-  res.json(
-    GetCurrentAuthUserResponse.parse({
-      user: req.isAuthenticated() ? req.user : null,
-    }),
-  );
+  const user = req.isAuthenticated()
+    ? { ...req.user, isOwner: isOwner(req.user.id) }
+    : null;
+  res.json(GetCurrentAuthUserResponse.parse({ user }));
 });
 
 router.get("/login", async (req: Request, res: Response) => {

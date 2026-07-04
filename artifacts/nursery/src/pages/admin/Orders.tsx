@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "wouter";
 import { AdminLayout } from "@/components/AdminLayout";
 import { useListOrders, getListOrdersQueryKey, useUpdateOrderStatus } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
@@ -105,13 +106,19 @@ export default function AdminOrders() {
               ) : (
                 orders?.map((order) => (
                   <tr key={order.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-4 font-medium">#{order.id}</td>
+                    <td className="px-6 py-4 font-medium">
+                      <Link href={`/admin/orders/${order.id}`} className="hover:text-primary hover:underline">
+                        #{order.id}
+                      </Link>
+                    </td>
                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
                       {format(new Date(order.createdAt), 'MMM d, yyyy')}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium">{order.customerName || "Guest"}</div>
-                      <div className="text-xs text-muted-foreground">{order.customerEmail || "No email provided"}</div>
+                      <Link href={`/admin/orders/${order.id}`} className="block hover:text-primary transition-colors">
+                        <div className="font-medium">{order.customerName || "Guest"}</div>
+                        <div className="text-xs text-muted-foreground">{order.customerEmail || "No email provided"}</div>
+                      </Link>
                     </td>
                     <td className="px-6 py-4 text-right font-medium">${order.total.toFixed(2)}</td>
                     <td className="px-6 py-4 text-center">
