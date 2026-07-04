@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@workspace/replit-auth-web";
 import { ArrowLeft, Minus, Plus, Droplets, Sun, Sprout, ShieldCheck } from "lucide-react";
 
 export default function ProductDetail() {
@@ -14,6 +15,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
 
   const { data: product, isLoading } = useGetProduct(productId, { 
     query: { enabled: !!productId, queryKey: getGetProductQueryKey(productId) } 
@@ -22,6 +24,10 @@ export default function ProductDetail() {
   const addToCart = useAddToCart();
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      window.location.href = `/api/login?returnTo=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
     addToCart.mutate({ data: { productId, quantity } }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
@@ -168,7 +174,7 @@ export default function ProductDetail() {
               onClick={handleAddToCart}
               disabled={product.stock === 0 || addToCart.isPending}
             >
-              {product.stock === 0 ? "Out of Stock" : addToCart.isPending ? "Adding..." : "Add to Cart"}
+              {product.stock === 0 ? "Out of Stock" : !isAuthenticated ? "Log in to Add to Cart" : addToCart.isPending ? "Adding..." : "Add to Cart"}
             </Button>
           </div>
         </div>
