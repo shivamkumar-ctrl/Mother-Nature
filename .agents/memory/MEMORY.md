@@ -1,0 +1,2 @@
+- [Owner auth pattern](owner-auth.md) — Owner identified by OWNER_USER_ID env var; all other authenticated users are customers. API routes enforce this.
+- [Replit auth lib tsconfig fix](replit-auth-web-tsconfig.md) — replit-auth-web cannot use import.meta.env or vite/client types; use window.__BASE_URL__ fallback instead.
