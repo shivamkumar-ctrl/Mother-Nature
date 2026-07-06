@@ -12,6 +12,7 @@ import ProductDetail from "@/pages/ProductDetail";
 import Cart from "@/pages/Cart";
 import CustomerOrders from "@/pages/CustomerOrders";
 import CustomerOrderDetail from "@/pages/CustomerOrderDetail";
+import Wishlist from "@/pages/Wishlist";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/Dashboard";
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/cart" component={Cart} />
       <Route path="/orders" component={CustomerOrders} />
       <Route path="/orders/:id" component={CustomerOrderDetail} />
+      <Route path="/wishlist" component={Wishlist} />
       
       {/* Admin Routes */}
       <Route path="/admin" component={AdminDashboard} />

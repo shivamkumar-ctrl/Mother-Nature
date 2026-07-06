@@ -4,6 +4,7 @@ import authRouter from "./auth";
 import productsRouter from "./products";
 import cartRouter from "./cart";
 import ordersRouter from "./orders";
+import wishlistRouter from "./wishlist";
 import customersRouter from "./customers";
 import dashboardRouter from "./dashboard";
 
@@ -14,6 +15,7 @@ router.use(authRouter);
 router.use(productsRouter);
 router.use(cartRouter);
 router.use(ordersRouter);
+router.use(wishlistRouter);
 router.use(customersRouter);
 router.use(dashboardRouter);
 

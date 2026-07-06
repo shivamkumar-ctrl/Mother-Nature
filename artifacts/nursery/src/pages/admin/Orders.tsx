@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { Package } from "lucide-react";
-import type { OrderStatusUpdateStatus } from "@workspace/api-client-react/src/generated/api.schemas";
+import type { OrderStatusUpdateStatus } from "@workspace/api-client-react";
 
 export default function AdminOrders() {
   const [statusFilter, setStatusFilter] = useState("all");

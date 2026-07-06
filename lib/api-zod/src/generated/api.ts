@@ -30,7 +30,7 @@ export const GetCurrentAuthUserResponse = zod.object({
   "firstName": zod.string().nullable(),
   "lastName": zod.string().nullable(),
   "profileImageUrl": zod.string().nullable(),
-  "isOwner": zod.boolean()
+  "isOwner": zod.boolean().optional()
 }),zod.null()])
 })
 
@@ -522,6 +522,35 @@ export const UpdateOrderStatusResponse = zod.object({
 
 
 /**
+ * @summary Cancel order (customer, within 2 hours of placing)
+ */
+export const CancelOrderParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CancelOrderResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.string(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
+  "status": zod.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
+  "total": zod.number(),
+  "shippingAddress": zod.string(),
+  "notes": zod.string().nullish(),
+  "items": zod.array(zod.object({
+  "id": zod.number(),
+  "orderId": zod.number(),
+  "productId": zod.number(),
+  "quantity": zod.number(),
+  "unitPrice": zod.number(),
+  "productName": zod.string()
+})),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
  * @summary List all customers (owner only)
  */
 export const ListCustomersQueryParams = zod.object({
@@ -620,5 +649,74 @@ export const GetLowStockProductsResponseItem = zod.object({
   "updatedAt": zod.coerce.date()
 })
 export const GetLowStockProductsResponse = zod.array(GetLowStockProductsResponseItem)
+
+
+/**
+ * @summary Get current user's wishlist
+ */
+export const GetWishlistResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.string(),
+  "productId": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "product": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "description": zod.string(),
+  "price": zod.number(),
+  "category": zod.string(),
+  "stock": zod.number(),
+  "imageUrl": zod.string().nullable(),
+  "featured": zod.boolean().optional(),
+  "careLevel": zod.string().nullish(),
+  "sunlight": zod.string().nullish(),
+  "watering": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+})
+export const GetWishlistResponse = zod.array(GetWishlistResponseItem)
+
+
+/**
+ * @summary Add product to wishlist
+ */
+export const AddToWishlistBody = zod.object({
+  "productId": zod.number()
+})
+
+export const AddToWishlistResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.string(),
+  "productId": zod.number(),
+  "createdAt": zod.coerce.date(),
+  "product": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "description": zod.string(),
+  "price": zod.number(),
+  "category": zod.string(),
+  "stock": zod.number(),
+  "imageUrl": zod.string().nullable(),
+  "featured": zod.boolean().optional(),
+  "careLevel": zod.string().nullish(),
+  "sunlight": zod.string().nullish(),
+  "watering": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+})
+
+
+/**
+ * @summary Remove product from wishlist
+ */
+export const RemoveFromWishlistParams = zod.object({
+  "productId": zod.coerce.number()
+})
+
+export const RemoveFromWishlistResponse = zod.object({
+  "success": zod.boolean()
+})
 
 

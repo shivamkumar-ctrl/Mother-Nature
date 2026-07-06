@@ -1,34 +1,68 @@
 import React from "react";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Sprout } from "lucide-react";
+import { Leaf, CheckCircle, Shield } from "lucide-react";
 
 export default function Login() {
-  const { login } = useAuth();
+  const [, navigate] = useLocation();
+
+  const handleAllow = () => {
+    const params = new URLSearchParams(window.location.search);
+    const returnTo = params.get("returnTo") || "/";
+    window.location.href = `/api/login?returnTo=${encodeURIComponent(returnTo)}`;
+  };
+
+  const handleDeny = () => {
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md p-8 bg-card border rounded-2xl shadow-xl text-center space-y-8">
-          <div className="flex justify-center">
-            <div className="h-16 w-16 bg-accent rounded-full flex items-center justify-center text-primary">
-              <Sprout className="h-8 w-8" />
+        <div className="w-full max-w-sm bg-card border rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-primary/5 border-b p-6 text-center space-y-3">
+            <div className="flex justify-center">
+              <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
+                <Leaf className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <div>
+              <p className="text-base font-semibold text-primary font-serif">Mother Nature Nursery</p>
+              <p className="text-lg font-medium text-foreground mt-1">
+                would like to access your account
+              </p>
             </div>
           </div>
-          <div className="space-y-2">
-            <h1 className="text-3xl font-serif text-primary">Welcome Back</h1>
-            <p className="text-muted-foreground">Sign in to your Bloom & Root account to track orders and save your favorite plants.</p>
+
+          <div className="p-6 space-y-4">
+            <p className="text-sm text-muted-foreground font-medium">This will allow Mother Nature Nursery to:</p>
+            <ul className="space-y-3">
+              {[
+                "View your name and email address",
+                "Manage your orders and shopping cart",
+                "Save your wishlist and preferences",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-foreground">
+                  <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          
-          <div className="pt-4 pb-2">
-            <Button size="lg" className="w-full h-12 text-lg" onClick={() => login()}>
-              Log In securely
+
+          <div className="px-6 pb-4 flex gap-3">
+            <Button variant="outline" className="flex-1" onClick={handleDeny}>
+              Deny
+            </Button>
+            <Button className="flex-1" onClick={handleAllow}>
+              Allow Access
             </Button>
           </div>
-          
-          <p className="text-xs text-muted-foreground">
-            By logging in, you agree to our Terms of Service and Privacy Policy.
-          </p>
+
+          <div className="flex items-center justify-center gap-1.5 pb-5 px-6 text-xs text-muted-foreground">
+            <Shield className="h-3 w-3" />
+            <span>Secured by Replit Authentication</span>
+          </div>
         </div>
       </div>
     </div>

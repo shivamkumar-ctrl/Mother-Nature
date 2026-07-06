@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Plus, Search, Edit2, Trash2, Sprout } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Product, ProductInput } from "@workspace/api-client-react/src/generated/api.schemas";
+import type { Product, ProductInput } from "@workspace/api-client-react";
 
 export default function AdminProducts() {
   const [search, setSearch] = useState("");

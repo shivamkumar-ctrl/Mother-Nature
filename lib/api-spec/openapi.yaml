@@ -564,6 +564,43 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
 
+  /orders/{id}/cancel:
+    post:
+      tags: [orders]
+      operationId: cancelOrder
+      summary: Cancel order (customer, within 2 hours of placing)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Cancelled order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          description: Cannot cancel (too late or wrong status)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
   # ─── Customers (owner only) ───────────────────────────────────────────────────
   /customers:
     get:
@@ -710,6 +747,76 @@ paths:
                 $ref: "#/components/schemas/ErrorEnvelope"
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  # ─── Wishlist ──────────────────────────────────────────────────────────────────
+  /wishlist:
+    get:
+      tags: [wishlist]
+      operationId: getWishlist
+      summary: Get current user's wishlist
+      responses:
+        "200":
+          description: Wishlist items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WishlistItem"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+    post:
+      tags: [wishlist]
+      operationId: addToWishlist
+      summary: Add product to wishlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WishlistInput"
+      responses:
+        "201":
+          description: Added to wishlist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WishlistItem"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /wishlist/{productId}:
+    delete:
+      tags: [wishlist]
+      operationId: removeFromWishlist
+      summary: Remove product from wishlist
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Removed from wishlist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
@@ -1057,4 +1164,34 @@ components:
         revenueThisMonth:
           type: number
         ordersThisMonth:
+          type: integer
+
+    SuccessResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+
+    WishlistItem:
+      type: object
+      required: [id, userId, productId, createdAt, product]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        productId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        product:
+          $ref: "#/components/schemas/Product"
+
+    WishlistInput:
+      type: object
+      required: [productId]
+      properties:
+        productId:
           type: integer

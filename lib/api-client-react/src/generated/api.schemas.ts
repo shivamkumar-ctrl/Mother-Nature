@@ -19,7 +19,7 @@ export interface AuthUser {
   lastName: string | null;
   /** @nullable */
   profileImageUrl: string | null;
-  isOwner: boolean;
+  isOwner?: boolean;
 }
 
 export interface AuthUserEnvelope {
@@ -212,6 +212,22 @@ export interface DashboardStats {
   lowStockCount: number;
   revenueThisMonth?: number;
   ordersThisMonth?: number;
+}
+
+export interface SuccessResponse {
+  success: boolean;
+}
+
+export interface WishlistItem {
+  id: number;
+  userId: string;
+  productId: number;
+  createdAt: string;
+  product: Product;
+}
+
+export interface WishlistInput {
+  productId: number;
 }
 
 /**

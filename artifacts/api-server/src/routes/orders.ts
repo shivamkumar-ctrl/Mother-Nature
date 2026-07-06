@@ -6,6 +6,7 @@ import {
   GetOrderParams,
   UpdateOrderStatusParams,
   UpdateOrderStatusBody,
+  CancelOrderParams,
 } from "@workspace/api-zod";
 import { isOwner } from "./products";
 
@@ -125,6 +126,53 @@ router.patch("/orders/:id/status", async (req, res): Promise<void> => {
   }
 
   res.json(await buildOrderResponse(order));
+});
+
+router.post("/orders/:id/cancel", async (req, res): Promise<void> => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const params = CancelOrderParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const [order] = await db
+    .select()
+    .from(ordersTable)
+    .where(eq(ordersTable.id, params.data.id));
+
+  if (!order) {
+    res.status(404).json({ error: "Order not found" });
+    return;
+  }
+
+  if (!isOwner(req.user.id) && order.userId !== req.user.id) {
+    res.status(403).json({ error: "Forbidden" });
+    return;
+  }
+
+  const twoHoursMs = 2 * 60 * 60 * 1000;
+  if (Date.now() - order.createdAt.getTime() > twoHoursMs) {
+    res.status(400).json({ error: "Cannot cancel: order was placed more than 2 hours ago" });
+    return;
+  }
+
+  if (!["pending", "processing"].includes(order.status)) {
+    res.status(400).json({ error: `Cannot cancel: order is already ${order.status}` });
+    return;
+  }
+
+  const [cancelled] = await db
+    .update(ordersTable)
+    .set({ status: "cancelled" })
+    .where(eq(ordersTable.id, params.data.id))
+    .returning();
+
+  res.json(await buildOrderResponse(cancelled));
 });
 
 export default router;

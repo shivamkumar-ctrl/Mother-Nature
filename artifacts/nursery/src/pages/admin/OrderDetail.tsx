@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { ArrowLeft, MapPin, Truck, Package, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import type { OrderStatusUpdateStatus } from "@workspace/api-client-react/src/generated/api.schemas";
+import type { OrderStatusUpdateStatus } from "@workspace/api-client-react";
 
 export default function AdminOrderDetail() {
   const { id } = useParams();

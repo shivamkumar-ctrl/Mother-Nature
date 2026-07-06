@@ -96,7 +96,7 @@ export default function Shop() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-accent/50 text-muted-foreground">
-                        <span className="font-serif italic opacity-50">Bloom & Root</span>
+                        <span className="font-serif italic opacity-50">Mother Nature</span>
                       </div>
                     )}
                     {product.stock === 0 && (

@@ -41,7 +41,10 @@ import type {
   OrderStatusUpdate,
   Product,
   ProductInput,
-  ProductUpdate
+  ProductUpdate,
+  SuccessResponse,
+  WishlistInput,
+  WishlistItem
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -1572,6 +1575,76 @@ export const useUpdateOrderStatus = <TError = ErrorType<ErrorEnvelope>,
       return useMutation(getUpdateOrderStatusMutationOptions(options));
     }
 
+export const getCancelOrderUrl = (id: number,) => {
+
+
+
+
+  return `/api/orders/${id}/cancel`
+}
+
+/**
+ * @summary Cancel order (customer, within 2 hours of placing)
+ */
+export const cancelOrder = async (id: number, options?: RequestInit): Promise<Order> => {
+
+  return customFetch<Order>(getCancelOrderUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getCancelOrderMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOrder>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelOrder>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['cancelOrder'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelOrder>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  cancelOrder(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelOrderMutationResult = NonNullable<Awaited<ReturnType<typeof cancelOrder>>>
+
+    export type CancelOrderMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Cancel order (customer, within 2 hours of placing)
+ */
+export const useCancelOrder = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOrder>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof cancelOrder>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getCancelOrderMutationOptions(options));
+    }
+
 export const getListCustomersUrl = (params?: ListCustomersParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -1963,4 +2036,221 @@ export function useGetLowStockProducts<TData = Awaited<ReturnType<typeof getLowS
 
 
 
+
+export const getGetWishlistUrl = () => {
+
+
+
+
+  return `/api/wishlist`
+}
+
+/**
+ * @summary Get current user's wishlist
+ */
+export const getWishlist = async ( options?: RequestInit): Promise<WishlistItem[]> => {
+
+  return customFetch<WishlistItem[]>(getGetWishlistUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWishlistQueryKey = () => {
+    return [
+    `/api/wishlist`
+    ] as const;
+    }
+
+
+export const getGetWishlistQueryOptions = <TData = Awaited<ReturnType<typeof getWishlist>>, TError = ErrorType<ErrorEnvelope>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWishlist>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWishlistQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWishlist>>> = ({ signal }) => getWishlist({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWishlist>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWishlistQueryResult = NonNullable<Awaited<ReturnType<typeof getWishlist>>>
+export type GetWishlistQueryError = ErrorType<ErrorEnvelope>
+
+
+/**
+ * @summary Get current user's wishlist
+ */
+
+export function useGetWishlist<TData = Awaited<ReturnType<typeof getWishlist>>, TError = ErrorType<ErrorEnvelope>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWishlist>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWishlistQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getAddToWishlistUrl = () => {
+
+
+
+
+  return `/api/wishlist`
+}
+
+/**
+ * @summary Add product to wishlist
+ */
+export const addToWishlist = async (wishlistInput: WishlistInput, options?: RequestInit): Promise<WishlistItem> => {
+
+  return customFetch<WishlistItem>(getAddToWishlistUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(wishlistInput)
+  }
+);}
+
+
+
+
+export const getAddToWishlistMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addToWishlist>>, TError,{data: BodyType<WishlistInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addToWishlist>>, TError,{data: BodyType<WishlistInput>}, TContext> => {
+
+const mutationKey = ['addToWishlist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addToWishlist>>, {data: BodyType<WishlistInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  addToWishlist(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddToWishlistMutationResult = NonNullable<Awaited<ReturnType<typeof addToWishlist>>>
+    export type AddToWishlistMutationBody = BodyType<WishlistInput>
+    export type AddToWishlistMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Add product to wishlist
+ */
+export const useAddToWishlist = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addToWishlist>>, TError,{data: BodyType<WishlistInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addToWishlist>>,
+        TError,
+        {data: BodyType<WishlistInput>},
+        TContext
+      > => {
+      return useMutation(getAddToWishlistMutationOptions(options));
+    }
+
+export const getRemoveFromWishlistUrl = (productId: number,) => {
+
+
+
+
+  return `/api/wishlist/${productId}`
+}
+
+/**
+ * @summary Remove product from wishlist
+ */
+export const removeFromWishlist = async (productId: number, options?: RequestInit): Promise<SuccessResponse> => {
+
+  return customFetch<SuccessResponse>(getRemoveFromWishlistUrl(productId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getRemoveFromWishlistMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeFromWishlist>>, TError,{productId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeFromWishlist>>, TError,{productId: number}, TContext> => {
+
+const mutationKey = ['removeFromWishlist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeFromWishlist>>, {productId: number}> = (props) => {
+          const {productId} = props ?? {};
+
+          return  removeFromWishlist(productId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveFromWishlistMutationResult = NonNullable<Awaited<ReturnType<typeof removeFromWishlist>>>
+
+    export type RemoveFromWishlistMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Remove product from wishlist
+ */
+export const useRemoveFromWishlist = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeFromWishlist>>, TError,{productId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof removeFromWishlist>>,
+        TError,
+        {productId: number},
+        TContext
+      > => {
+      return useMutation(getRemoveFromWishlistMutationOptions(options));
+    }
 
