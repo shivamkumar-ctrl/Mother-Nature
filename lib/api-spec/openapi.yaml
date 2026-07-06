@@ -1059,9 +1059,11 @@ components:
 
     CheckoutInput:
       type: object
-      required: [shippingAddress]
+      required: [shippingAddress, phoneNumber]
       properties:
         shippingAddress:
+          type: string
+        phoneNumber:
           type: string
         notes:
           type: string
@@ -1094,6 +1096,8 @@ components:
         customerName:
           type: [string, 'null']
         customerEmail:
+          type: [string, 'null']
+        phoneNumber:
           type: [string, 'null']
         status:
           type: string

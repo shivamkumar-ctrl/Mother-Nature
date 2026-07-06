@@ -21,6 +21,7 @@ export default function Cart() {
   const [, setLocation] = useLocation();
 
   const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
 
   const handleUpdateQuantity = (productId: number, quantity: number) => {
@@ -40,19 +41,24 @@ export default function Cart() {
 
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!address) {
-      toast({ title: "Address required", variant: "destructive" });
+    if (!address.trim()) {
+      toast({ title: "Shipping address is required", variant: "destructive" });
       return;
     }
-    
-    checkout.mutate({ data: { shippingAddress: address, notes } }, {
+    if (!phone.trim()) {
+      toast({ title: "Mobile number is required", variant: "destructive" });
+      return;
+    }
+
+    checkout.mutate({ data: { shippingAddress: address, phoneNumber: phone, notes } }, {
       onSuccess: (order) => {
         queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
         toast({ title: "Order placed successfully!" });
         setLocation(`/orders/${order.id}`);
       },
-      onError: () => {
-        toast({ title: "Checkout failed", variant: "destructive" });
+      onError: (err: unknown) => {
+        const msg = (err as { message?: string })?.message ?? "Checkout failed";
+        toast({ title: msg, variant: "destructive" });
       }
     });
   };
@@ -106,12 +112,19 @@ export default function Cart() {
                       <div>
                         <h3 className="font-serif font-medium">{item.product.name}</h3>
                         <p className="text-sm text-muted-foreground capitalize">{item.product.category}</p>
+                        <p className={`text-xs mt-0.5 font-medium ${item.product.stock <= 5 ? "text-orange-500" : "text-muted-foreground"}`}>
+                          {item.product.stock === 0
+                            ? "Out of stock"
+                            : item.product.stock <= 5
+                            ? `Only ${item.product.stock} left in stock`
+                            : `${item.product.stock} in stock`}
+                        </p>
                       </div>
                       <p className="font-medium">${item.product.price.toFixed(2)}</p>
                     </div>
                     <div className="flex justify-between items-center mt-4">
                       <div className="flex items-center border rounded-md">
-                        <button 
+                        <button
                           className="p-1 hover:bg-muted transition-colors disabled:opacity-50"
                           onClick={() => handleUpdateQuantity(item.productId, item.quantity - 1)}
                           disabled={item.quantity <= 1 || updateItem.isPending}
@@ -119,7 +132,7 @@ export default function Cart() {
                           <Minus className="h-4 w-4" />
                         </button>
                         <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                        <button 
+                        <button
                           className="p-1 hover:bg-muted transition-colors disabled:opacity-50"
                           onClick={() => handleUpdateQuantity(item.productId, item.quantity + 1)}
                           disabled={item.quantity >= item.product.stock || updateItem.isPending}
@@ -127,7 +140,7 @@ export default function Cart() {
                           <Plus className="h-4 w-4" />
                         </button>
                       </div>
-                      <button 
+                      <button
                         onClick={() => handleRemove(item.productId)}
                         disabled={removeItem.isPending}
                         className="text-muted-foreground hover:text-destructive transition-colors text-sm flex items-center gap-1"
@@ -160,20 +173,35 @@ export default function Cart() {
 
                 <form onSubmit={handleCheckout} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="address">Shipping Address</Label>
-                    <Textarea 
-                      id="address" 
-                      placeholder="123 Garden Lane..." 
+                    <Label htmlFor="address">
+                      Shipping Address <span className="text-destructive">*</span>
+                    </Label>
+                    <Textarea
+                      id="address"
+                      placeholder="123 Garden Lane, City, State, ZIP"
                       required
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="phone">
+                      Mobile Number <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="notes">Order Notes (Optional)</Label>
-                    <Input 
-                      id="notes" 
-                      placeholder="Leave at front door" 
+                    <Input
+                      id="notes"
+                      placeholder="Leave at front door"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                     />

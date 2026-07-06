@@ -403,6 +403,7 @@ export const RemoveFromCartResponse = zod.object({
  */
 export const CheckoutCartBody = zod.object({
   "shippingAddress": zod.string(),
+  "phoneNumber": zod.string(),
   "notes": zod.string().optional()
 })
 
@@ -411,6 +412,7 @@ export const CheckoutCartResponse = zod.object({
   "userId": zod.string(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
+  "phoneNumber": zod.string().nullish(),
   "status": zod.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
   "total": zod.number(),
   "shippingAddress": zod.string(),
@@ -441,6 +443,7 @@ export const ListOrdersResponseItem = zod.object({
   "userId": zod.string(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
+  "phoneNumber": zod.string().nullish(),
   "status": zod.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
   "total": zod.number(),
   "shippingAddress": zod.string(),
@@ -471,6 +474,7 @@ export const GetOrderResponse = zod.object({
   "userId": zod.string(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
+  "phoneNumber": zod.string().nullish(),
   "status": zod.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
   "total": zod.number(),
   "shippingAddress": zod.string(),
@@ -504,6 +508,7 @@ export const UpdateOrderStatusResponse = zod.object({
   "userId": zod.string(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
+  "phoneNumber": zod.string().nullish(),
   "status": zod.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
   "total": zod.number(),
   "shippingAddress": zod.string(),
@@ -533,6 +538,7 @@ export const CancelOrderResponse = zod.object({
   "userId": zod.string(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
+  "phoneNumber": zod.string().nullish(),
   "status": zod.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
   "total": zod.number(),
   "shippingAddress": zod.string(),
@@ -612,6 +618,7 @@ export const GetRecentOrdersResponseItem = zod.object({
   "userId": zod.string(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
+  "phoneNumber": zod.string().nullish(),
   "status": zod.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
   "total": zod.number(),
   "shippingAddress": zod.string(),

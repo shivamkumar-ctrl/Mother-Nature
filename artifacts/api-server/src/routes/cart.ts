@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { db, cartsTable, cartItemsTable, productsTable, ordersTable, orderItemsTable } from "@workspace/db";
 import {
   AddToCartBody,
@@ -20,7 +20,6 @@ async function getOrCreateCart(userId: string) {
 }
 
 async function buildCartResponse(cartId: number, userId: string) {
-  const cart = await db.select().from(cartsTable).where(eq(cartsTable.id, cartId));
   const items = await db
     .select({
       id: cartItemsTable.id,
@@ -102,6 +101,11 @@ router.post("/cart/items", async (req, res): Promise<void> => {
     return;
   }
 
+  if (product.stock <= 0) {
+    res.status(400).json({ error: `${product.name} is out of stock` });
+    return;
+  }
+
   const cart = await getOrCreateCart(req.user.id);
 
   const [existingItem] = await db
@@ -114,10 +118,19 @@ router.post("/cart/items", async (req, res): Promise<void> => {
       )
     );
 
+  const newQuantity = existingItem
+    ? existingItem.quantity + parsed.data.quantity
+    : parsed.data.quantity;
+
+  if (newQuantity > product.stock) {
+    res.status(400).json({ error: `Only ${product.stock} in stock for "${product.name}"` });
+    return;
+  }
+
   if (existingItem) {
     await db
       .update(cartItemsTable)
-      .set({ quantity: existingItem.quantity + parsed.data.quantity })
+      .set({ quantity: newQuantity })
       .where(eq(cartItemsTable.id, existingItem.id));
   } else {
     await db.insert(cartItemsTable).values({
@@ -233,6 +246,16 @@ router.post("/cart/checkout", async (req, res): Promise<void> => {
     return;
   }
 
+  // Validate stock before placing order
+  for (const item of items) {
+    if (item.product.stock < item.quantity) {
+      res.status(400).json({
+        error: `Insufficient stock for "${item.product.name}". Only ${item.product.stock} available.`,
+      });
+      return;
+    }
+  }
+
   const total = items.reduce(
     (sum, item) => sum + parseFloat(item.product.price) * item.quantity,
     0
@@ -244,6 +267,7 @@ router.post("/cart/checkout", async (req, res): Promise<void> => {
       userId: req.user.id,
       customerName: `${req.user.firstName ?? ""} ${req.user.lastName ?? ""}`.trim() || null,
       customerEmail: req.user.email ?? null,
+      phoneNumber: parsed.data.phoneNumber,
       status: "pending",
       total: String(Math.round(total * 100) / 100),
       shippingAddress: parsed.data.shippingAddress,
@@ -263,6 +287,14 @@ router.post("/cart/checkout", async (req, res): Promise<void> => {
     .insert(orderItemsTable)
     .values(orderItemValues)
     .returning();
+
+  // Decrement stock for each ordered product
+  for (const item of items) {
+    await db
+      .update(productsTable)
+      .set({ stock: sql`${productsTable.stock} - ${item.quantity}` })
+      .where(eq(productsTable.id, item.product.id));
+  }
 
   // Clear cart
   await db.delete(cartItemsTable).where(eq(cartItemsTable.cartId, cart.id));

@@ -13,9 +13,11 @@ import {
 const router: IRouter = Router();
 
 const OWNER_USER_ID = process.env.OWNER_USER_ID;
+const OWNER_EMAIL = process.env.OWNER_EMAIL;
 
-function isOwner(userId: string): boolean {
+function isOwner(userId: string, email?: string | null): boolean {
   if (OWNER_USER_ID && userId === OWNER_USER_ID) return true;
+  if (OWNER_EMAIL && email && email === OWNER_EMAIL) return true;
   return false;
 }
 
@@ -70,7 +72,7 @@ router.post("/products", async (req, res): Promise<void> => {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
-  if (!isOwner(req.user.id)) {
+  if (!isOwner(req.user.id, req.user.email)) {
     res.status(403).json({ error: "Forbidden: owner only" });
     return;
   }
@@ -127,7 +129,7 @@ router.patch("/products/:id", async (req, res): Promise<void> => {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
-  if (!isOwner(req.user.id)) {
+  if (!isOwner(req.user.id, req.user.email)) {
     res.status(403).json({ error: "Forbidden: owner only" });
     return;
   }
@@ -173,7 +175,7 @@ router.delete("/products/:id", async (req, res): Promise<void> => {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
-  if (!isOwner(req.user.id)) {
+  if (!isOwner(req.user.id, req.user.email)) {
     res.status(403).json({ error: "Forbidden: owner only" });
     return;
   }

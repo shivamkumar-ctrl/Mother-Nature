@@ -26,3 +26,4 @@ channel = "stable-25_05"
 
 [userenv.shared]
 OWNER_USER_ID = "2357170"
+OWNER_EMAIL = "shivamkumar.ase@gmail.com"

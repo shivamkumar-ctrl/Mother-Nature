@@ -44,7 +44,7 @@ router.get("/orders", async (req, res): Promise<void> => {
 
   let query = db.select().from(ordersTable).$dynamic();
 
-  if (isOwner(req.user.id)) {
+  if (isOwner(req.user.id, req.user.email)) {
     if (params.data.status) {
       query = query.where(eq(ordersTable.status, params.data.status));
     }
@@ -83,7 +83,7 @@ router.get("/orders/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  if (!isOwner(req.user.id) && order.userId !== req.user.id) {
+  if (!isOwner(req.user.id, req.user.email) && order.userId !== req.user.id) {
     res.status(403).json({ error: "Forbidden" });
     return;
   }
@@ -97,7 +97,7 @@ router.patch("/orders/:id/status", async (req, res): Promise<void> => {
     return;
   }
 
-  if (!isOwner(req.user.id)) {
+  if (!isOwner(req.user.id, req.user.email)) {
     res.status(403).json({ error: "Forbidden: owner only" });
     return;
   }
@@ -150,7 +150,7 @@ router.post("/orders/:id/cancel", async (req, res): Promise<void> => {
     return;
   }
 
-  if (!isOwner(req.user.id) && order.userId !== req.user.id) {
+  if (!isOwner(req.user.id, req.user.email) && order.userId !== req.user.id) {
     res.status(403).json({ error: "Forbidden" });
     return;
   }

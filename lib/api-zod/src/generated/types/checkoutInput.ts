@@ -8,5 +8,6 @@
 
 export interface CheckoutInput {
   shippingAddress: string;
+  phoneNumber: string;
   notes?: string;
 }

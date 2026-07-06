@@ -23,6 +23,7 @@ export const ordersTable = pgTable("orders", {
   userId: text("user_id").notNull(),
   customerName: text("customer_name"),
   customerEmail: text("customer_email"),
+  phoneNumber: text("phone_number"),
   status: text("status").notNull().default("pending"),
   total: numeric("total", { precision: 10, scale: 2 }).notNull(),
   shippingAddress: text("shipping_address").notNull(),
