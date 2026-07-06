@@ -12,8 +12,9 @@ export default function Login() {
     window.location.href = `/api/login?returnTo=${encodeURIComponent(returnTo)}`;
   };
 
-  const handleDeny = () => {
-    navigate("/");
+  const handleDeny = async () => {
+    await fetch("/api/logout", { method: "POST" });
+    window.location.href = "/login";
   };
 
   return (
