@@ -28,12 +28,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <span className="font-serif text-xl font-medium tracking-tight">Mother Nature</span>
             </Link>
 
-            <Link
-              href="/shop"
-              className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/shop") ? "text-primary" : "text-muted-foreground"}`}
-            >
-              Shop
-            </Link>
+            {isAuthenticated && (
+              <Link
+                href="/shop"
+                className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/shop") ? "text-primary" : "text-muted-foreground"}`}
+              >
+                Shop
+              </Link>
+            )}
 
             {/* Admin hamburger — only shown when logged in as owner */}
             {user?.isOwner && (
@@ -97,14 +99,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </>
             )}
 
-            <Link href="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors" title="Cart">
-              <ShoppingCart className="h-5 w-5" />
-              {cartItemCount > 0 && (
-                <span className="absolute top-0 right-0 -mt-1 -mr-1 h-5 w-5 rounded-full bg-secondary text-secondary-foreground text-xs flex items-center justify-center font-bold shadow-sm">
-                  {cartItemCount}
-                </span>
-              )}
-            </Link>
+            {isAuthenticated && (
+              <Link href="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors" title="Cart">
+                <ShoppingCart className="h-5 w-5" />
+                {cartItemCount > 0 && (
+                  <span className="absolute top-0 right-0 -mt-1 -mr-1 h-5 w-5 rounded-full bg-secondary text-secondary-foreground text-xs flex items-center justify-center font-bold shadow-sm">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* Login / Logout — always visible */}
             {isAuthenticated ? (

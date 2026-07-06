@@ -62,7 +62,7 @@ export default function Login() {
 
           <div className="flex items-center justify-center gap-1.5 pb-5 px-6 text-xs text-muted-foreground">
             <Shield className="h-3 w-3" />
-            <span>Secured by Replit Authentication</span>
+            <span>Secured by Authentication</span>
           </div>
         </div>
       </div>
