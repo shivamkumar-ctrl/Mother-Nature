@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "@/components/ui/button";
 import { useGetCart, useGetWishlist, getGetCartQueryKey, getGetWishlistQueryKey } from "@workspace/api-client-react";
-import { ShoppingCart, Leaf, Heart, Package, Menu, X } from "lucide-react";
+import { ShoppingCart, Leaf, Heart, Package, Menu, X, LayoutDashboard, ShoppingBag, ClipboardList, Users } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout, isAuthenticated } = useAuth();
@@ -11,53 +11,82 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const { data: wishlist } = useGetWishlist({ query: { queryKey: getGetWishlistQueryKey(), enabled: isAuthenticated } });
 
   const [location] = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   const cartItemCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const wishlistCount = wishlist?.length || 0;
-
-  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20 selection:text-primary">
       <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity" onClick={closeMobileMenu}>
+
+          {/* Left: Logo + Shop + Admin hamburger */}
+          <div className="flex items-center gap-5">
+            <Link href="/" className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity">
               <Leaf className="h-6 w-6" />
               <span className="font-serif text-xl font-medium tracking-tight">Mother Nature</span>
             </Link>
-            {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/shop" className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/shop") ? "text-primary" : "text-muted-foreground"}`}>
-                Shop
-              </Link>
-              {user?.isOwner && (
-                <Link href="/admin" className="text-sm font-medium text-secondary hover:text-secondary/80 transition-colors">
-                  Admin
-                </Link>
-              )}
-            </nav>
+
+            <Link
+              href="/shop"
+              className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/shop") ? "text-primary" : "text-muted-foreground"}`}
+            >
+              Shop
+            </Link>
+
+            {/* Admin hamburger — only shown when logged in as owner */}
+            {user?.isOwner && (
+              <div className="relative">
+                <button
+                  onClick={() => setAdminMenuOpen((o) => !o)}
+                  className="flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-secondary/80 transition-colors px-2 py-1 rounded-md hover:bg-secondary/10"
+                  aria-label="Admin menu"
+                >
+                  {adminMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+                  <span>Admin</span>
+                </button>
+
+                {adminMenuOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-52 bg-card border rounded-xl shadow-lg py-1 z-50">
+                    {[
+                      { href: "/admin", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+                      { href: "/admin/products", label: "Products", icon: <ShoppingBag className="h-4 w-4" /> },
+                      { href: "/admin/orders", label: "Orders", icon: <ClipboardList className="h-4 w-4" /> },
+                      { href: "/admin/customers", label: "Customers", icon: <Users className="h-4 w-4" /> },
+                    ].map(({ href, label, icon }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setAdminMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-muted transition-colors ${location === href || location.startsWith(href + "/") ? "text-primary font-medium" : "text-foreground"}`}
+                      >
+                        {icon}
+                        {label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
+          {/* Right: icons + Login/Logout */}
           <div className="flex items-center gap-1">
-            {/* Desktop auth button */}
-            {isAuthenticated ? (
-              <Button variant="ghost" size="sm" onClick={() => logout()} className="text-sm font-medium hidden md:inline-flex">
-                Log out
-              </Button>
-            ) : (
-              <Button variant="ghost" size="sm" onClick={() => { window.location.href = "/api/login"; }} className="text-sm font-medium hidden md:inline-flex">
-                Log in
-              </Button>
-            )}
-
             {isAuthenticated && (
               <>
-                <Link href="/orders" className={`relative p-2 transition-colors hover:text-primary ${location.startsWith("/orders") ? "text-primary" : "text-foreground"}`} title="Order History">
+                <Link
+                  href="/orders"
+                  className={`relative p-2 transition-colors hover:text-primary ${location.startsWith("/orders") ? "text-primary" : "text-foreground"}`}
+                  title="Order History"
+                >
                   <Package className="h-5 w-5" />
                 </Link>
-                <Link href="/wishlist" className={`relative p-2 transition-colors hover:text-primary ${location.startsWith("/wishlist") ? "text-primary" : "text-foreground"}`} title="Wishlist">
+                <Link
+                  href="/wishlist"
+                  className={`relative p-2 transition-colors hover:text-primary ${location.startsWith("/wishlist") ? "text-primary" : "text-foreground"}`}
+                  title="Wishlist"
+                >
                   <Heart className="h-5 w-5" />
                   {wishlistCount > 0 && (
                     <span className="absolute top-0 right-0 -mt-1 -mr-1 h-4 w-4 rounded-full bg-secondary text-secondary-foreground text-[10px] flex items-center justify-center font-bold shadow-sm">
@@ -77,57 +106,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
               )}
             </Link>
 
-            {/* Hamburger — mobile only */}
-            <button
-              className="md:hidden p-2 rounded-md hover:bg-muted transition-colors ml-1"
-              onClick={() => setMobileMenuOpen((o) => !o)}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
+            {/* Login / Logout — always visible */}
+            {isAuthenticated ? (
+              <Button variant="ghost" size="sm" onClick={() => logout()} className="text-sm font-medium ml-1">
+                Log out
+              </Button>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => { window.location.href = "/api/login"; }} className="text-sm font-medium ml-1">
+                Log in
+              </Button>
+            )}
           </div>
         </div>
 
-        {/* Mobile dropdown menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t bg-background/95 backdrop-blur-md px-4 py-4 flex flex-col gap-3">
-            <Link
-              href="/shop"
-              onClick={closeMobileMenu}
-              className={`text-sm font-medium py-2 transition-colors hover:text-primary ${location.startsWith("/shop") ? "text-primary" : "text-foreground"}`}
-            >
-              Shop
-            </Link>
-            {user?.isOwner && (
-              <Link
-                href="/admin"
-                onClick={closeMobileMenu}
-                className="text-sm font-medium py-2 text-secondary hover:text-secondary/80 transition-colors"
-              >
-                Admin Dashboard
-              </Link>
-            )}
-            <div className="border-t pt-3">
-              {isAuthenticated ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => { logout(); closeMobileMenu(); }}
-                >
-                  Log out
-                </Button>
-              ) : (
-                <Button
-                  size="sm"
-                  className="w-full"
-                  onClick={() => { window.location.href = "/api/login"; closeMobileMenu(); }}
-                >
-                  Log in
-                </Button>
-              )}
-            </div>
-          </div>
+        {/* Click-away overlay to close admin menu */}
+        {adminMenuOpen && (
+          <div className="fixed inset-0 z-40" onClick={() => setAdminMenuOpen(false)} />
         )}
       </header>
 

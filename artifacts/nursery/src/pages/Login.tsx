@@ -14,7 +14,7 @@ export default function Login() {
 
   const handleDeny = async () => {
     await fetch("/api/logout", { method: "POST" });
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   return (
@@ -28,7 +28,7 @@ export default function Login() {
               </div>
             </div>
             <div>
-              <p className="text-base font-semibold text-primary font-serif">Mother Nature Nursery</p>
+              <p className="text-base font-semibold text-primary font-serif">Mother Nature</p>
               <p className="text-lg font-medium text-foreground mt-1">
                 would like to access your account
               </p>
@@ -36,7 +36,7 @@ export default function Login() {
           </div>
 
           <div className="p-6 space-y-4">
-            <p className="text-sm text-muted-foreground font-medium">This will allow Mother Nature Nursery to:</p>
+            <p className="text-sm text-muted-foreground font-medium">This will allow Mother Nature to:</p>
             <ul className="space-y-3">
               {[
                 "View your name and email address",

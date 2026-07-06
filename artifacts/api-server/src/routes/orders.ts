@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
-import { eq, desc } from "drizzle-orm";
-import { db, ordersTable, orderItemsTable } from "@workspace/db";
+import { eq, desc, sql } from "drizzle-orm";
+import { db, ordersTable, orderItemsTable, productsTable } from "@workspace/db";
 import {
   ListOrdersQueryParams,
   GetOrderParams,
@@ -114,16 +114,27 @@ router.patch("/orders/:id/status", async (req, res): Promise<void> => {
     return;
   }
 
+  // Block status changes on cancelled orders
+  const [existing] = await db
+    .select()
+    .from(ordersTable)
+    .where(eq(ordersTable.id, params.data.id));
+
+  if (!existing) {
+    res.status(404).json({ error: "Order not found" });
+    return;
+  }
+
+  if (existing.status === "cancelled") {
+    res.status(400).json({ error: "Cannot update a cancelled order" });
+    return;
+  }
+
   const [order] = await db
     .update(ordersTable)
     .set({ status: parsed.data.status })
     .where(eq(ordersTable.id, params.data.id))
     .returning();
-
-  if (!order) {
-    res.status(404).json({ error: "Order not found" });
-    return;
-  }
 
   res.json(await buildOrderResponse(order));
 });
@@ -171,6 +182,19 @@ router.post("/orders/:id/cancel", async (req, res): Promise<void> => {
     .set({ status: "cancelled" })
     .where(eq(ordersTable.id, params.data.id))
     .returning();
+
+  // Restore stock for every item in the cancelled order
+  const cancelledItems = await db
+    .select()
+    .from(orderItemsTable)
+    .where(eq(orderItemsTable.orderId, order.id));
+
+  for (const item of cancelledItems) {
+    await db
+      .update(productsTable)
+      .set({ stock: sql`${productsTable.stock} + ${item.quantity}` })
+      .where(eq(productsTable.id, item.productId));
+  }
 
   res.json(await buildOrderResponse(cancelled));
 });
