@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "wouter";
+import React, { useState, useEffect } from "react";
+import { Link, useSearch } from "wouter";
 import { Layout } from "@/components/Layout";
 import { useListProducts, getListProductsQueryKey } from "@workspace/api-client-react";
 import { Input } from "@/components/ui/input";
@@ -8,19 +8,43 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
+const CATEGORIES = [
+  { value: "all",                  label: "All Categories" },
+  { value: "bloom-throughout-year", label: "Bloom Throughout Year" },
+  { value: "summer-flowers",        label: "Summer Flowers" },
+  { value: "winter-flowers",        label: "Winter Flowers" },
+  { value: "monsoon-flowers",       label: "Monsoon Flowers" },
+  { value: "indoor-plants",         label: "Indoor Plants" },
+  { value: "outdoor-plants",        label: "Outdoor Plants" },
+  { value: "air-purifiers",         label: "Air Purifiers" },
+  { value: "medical-herbs",         label: "Medical Herbs" },
+  { value: "trees",                 label: "Trees" },
+  { value: "seeds",                 label: "Seeds" },
+];
+
 export default function Shop() {
+  const searchStr = useSearch();
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState(() => {
+    const params = new URLSearchParams(searchStr);
+    const cat = params.get("category") || "all";
+    return CATEGORIES.some((c) => c.value === cat) ? cat : "all";
+  });
+
+  // Re-sync when the URL query changes (e.g. clicking a navbar subcategory)
+  useEffect(() => {
+    const params = new URLSearchParams(searchStr);
+    const cat = params.get("category") || "all";
+    setCategory(CATEGORIES.some((c) => c.value === cat) ? cat : "all");
+  }, [searchStr]);
 
   const { data: products, isLoading } = useListProducts(
-    { 
+    {
       search: search || undefined,
-      category: category !== "all" ? category : undefined
-    }, 
+      category: category !== "all" ? category : undefined,
+    },
     { query: { queryKey: getListProductsQueryKey({ search: search || undefined, category: category !== "all" ? category : undefined }) } }
   );
-
-  const categories = ["all", "indoor", "outdoor", "succulents", "tools"];
 
   return (
     <Layout>
@@ -58,8 +82,8 @@ export default function Shop() {
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((c) => (
-                  <SelectItem key={c} value={c} className="capitalize">{c}</SelectItem>
+                {CATEGORIES.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
