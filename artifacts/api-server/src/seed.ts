@@ -1,5 +1,5 @@
 import { db, productsTable } from "@workspace/db";
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { logger } from "./lib/logger";
 import PLANT_IMAGES_RAW from "./plant-images.json" with { type: "json" };
 
@@ -227,37 +227,53 @@ const PRODUCTS: Row[] = [
 
 // ─── seedIfEmpty ─────────────────────────────────────────────────────────────
 
-export async function seedIfEmpty(): Promise<void> {
+export async function seedAndSyncImages(): Promise<void> {
   const [{ value }] = await db.select({ value: count() }).from(productsTable);
-  if (value >= PRODUCTS.length) {
-    logger.info({ productCount: value }, "Products already seeded, skipping.");
+
+  if (value < PRODUCTS.length) {
+    logger.info({ existing: value, expected: PRODUCTS.length }, "Products table incomplete — clearing and seeding…");
+    await db.delete(productsTable);
+
+    const rows = PRODUCTS.map((p) => {
+      const imgs = pickImages(p.name);
+      return {
+        name:        p.name,
+        description: p.description,
+        price:       price(p.category, p.careLevel, p.name),
+        category:    p.category,
+        stock:       stockCount(p.name),
+        imageUrl:    imgs[0] ?? "",
+        imageUrls:   JSON.stringify(imgs),
+        featured:    false,
+        careLevel:   p.careLevel,
+        sunlight:    p.light,
+        watering:    p.watering,
+      };
+    });
+
+    for (let i = 0; i < rows.length; i += 50) {
+      await db.insert(productsTable).values(rows.slice(i, i + 50));
+    }
+    logger.info({ count: rows.length }, "Seeding complete.");
     return;
   }
 
-  logger.info({ existing: value, expected: PRODUCTS.length }, "Products table incomplete — clearing and seeding…");
+  // Products exist — sync images from current imageMap so updates deploy automatically
+  const existing = await db
+    .select({ id: productsTable.id, name: productsTable.name, imageUrls: productsTable.imageUrls })
+    .from(productsTable);
 
-  await db.delete(productsTable);
-
-  const rows = PRODUCTS.map((p) => {
-    const imgs = pickImages(p.name);
-    return {
-      name:        p.name,
-      description: p.description,
-      price:       price(p.category, p.careLevel, p.name),
-      category:    p.category,
-      stock:       stockCount(p.name),
-      imageUrl:    imgs[0] ?? "",
-      imageUrls:   JSON.stringify(imgs),
-      featured:    false,
-      careLevel:   p.careLevel,
-      sunlight:    p.light,
-      watering:    p.watering,
-    };
-  });
-
-  for (let i = 0; i < rows.length; i += 50) {
-    await db.insert(productsTable).values(rows.slice(i, i + 50));
+  let updated = 0;
+  for (const row of existing) {
+    const imgs = pickImages(row.name);
+    if (!imgs.length) continue;
+    const currentUrls = JSON.stringify(imgs);
+    if (row.imageUrls === currentUrls) continue;
+    await db
+      .update(productsTable)
+      .set({ imageUrl: imgs[0], imageUrls: currentUrls })
+      .where(eq(productsTable.id, row.id));
+    updated++;
   }
-
-  logger.info({ count: rows.length }, "Seeding complete.");
+  logger.info({ updated, total: existing.length }, "Image sync complete.");
 }
