@@ -1,5 +1,13 @@
 import { db, productsTable } from "@workspace/db";
 import { sql } from "drizzle-orm";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { join, dirname } from "node:path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PLANT_IMAGES: Record<string, string[]> = JSON.parse(
+  readFileSync(join(__dirname, "plant-images.json"), "utf-8")
+);
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -31,86 +39,13 @@ function stockCount(name: string): number {
   return 15 + (hash(name + "stock") % 36);
 }
 
-/** Pick 2-3 images from a category pool deterministically */
-function pickImages(name: string, pool: string[]): string[] {
-  const n = pool.length;
-  const count = 2 + (hash(name) % 2); // 2 or 3 images
-  const start = hash(name + "img") % n;
-  const picked: string[] = [];
-  for (let i = 0; i < count; i++) {
-    picked.push(pool[(start + i) % n]);
-  }
-  return picked;
+/** Get 2-3 specific images for a plant by exact name */
+function pickImages(name: string): string[] {
+  const imgs = PLANT_IMAGES[name];
+  if (imgs && imgs.length > 0) return imgs.slice(0, 3);
+  // fallback: no image
+  return [];
 }
-
-// ─── image pools per category ────────────────────────────────────────────────
-
-const IMAGE_POOLS: Record<string, string[]> = {
-  "bloom-throughout-year": [
-    "https://gardenerspath.com/wp-content/uploads/2020/03/Red-Hibiscus-Flowers-in-Bright-Sunshine.jpg",
-    "https://gardenerspath.com/wp-content/uploads/2022/09/Orange-Bougainvillea-Cascading-over-a-Fence.jpg",
-    "https://www.rainbowgardens.biz/wp-content/uploads/2026/04/stock-flowers-1-1-500x419.jpg",
-    "https://www.rainbowgardens.biz/wp-content/uploads/2026/04/stock-flowers-13-500x419.jpg",
-    "https://hips.hearstapps.com/hmg-prod/images/summer-flowers-lantana-65bd6a81437e0.jpg?crop=0.575xw:0.864xh;0.150xw,0.0401xh",
-    "https://www.gardenia.net/wp-content/uploads/2024/12/shutterstock_2505732167.jpg",
-  ],
-  "summer-flowers": [
-    "https://hips.hearstapps.com/hmg-prod/images/643ed36c-f6a2-47bd-bb56-6fd2cb8be56e.jpeg?crop=0.667xw:1xh;0.196xw,0xh&resize=360:*",
-    "https://hips.hearstapps.com/hmg-prod/images/9e8a06fb-5fdc-4e03-b243-f55cdf06a228.jpeg?crop=0.600xw:0.901xh;0.328xw,0.0969xh&resize=640:*",
-    "https://www.gardenia.net/wp-content/uploads/2023/05/flowers-and-herbs-for-rock-garden-300x300.webp",
-    "https://www.gardenia.net/wp-content/uploads/2024/12/shutterstock_2505732167.jpg",
-    "https://hips.hearstapps.com/hmg-prod/images/summer-flowers-lantana-65bd6a81437e0.jpg?crop=0.575xw:0.864xh;0.150xw,0.0401xh",
-    "https://gardenerspath.com/wp-content/uploads/2020/03/Red-Hibiscus-Flowers-in-Bright-Sunshine.jpg",
-  ],
-  "winter-flowers": [
-    "https://agriplanting.com/wp-content/uploads/2022/12/Petunia-winter-flowers.jpg",
-    "https://agriplanting.com/wp-content/uploads/2022/12/winter-flowers-plants-Pansy.jpg",
-    "https://blog.sfapp.magefan.top/media/urban-plant-india.myshopify.com/images/Winter%20Plants/3.webp",
-    "https://blog.sfapp.magefan.top/media/urban-plant-india.myshopify.com/images/Winter%20Plants/5.webp",
-    "https://www.gardenia.net/wp-content/uploads/2023/05/flowers-and-herbs-for-rock-garden-300x300.webp",
-    "https://hips.hearstapps.com/hmg-prod/images/643ed36c-f6a2-47bd-bb56-6fd2cb8be56e.jpeg?crop=0.667xw:1xh;0.196xw,0xh&resize=360:*",
-  ],
-  "monsoon-flowers": [
-    "https://www.andedge.com/wp-content/uploads/2024/12/Sacred_lotus_Nelumbo_nucifera.jpg",
-    "https://media.gettyimages.com/id/688852624/photo/wet-hibiscus-flower-in-the-garden.jpg?s=612x612&w=0&k=20&c=vLvyhu4Wlg8LXFKSb0iF_1e_rvXTeRZMEBIgyG52WQc=",
-    "https://media.gettyimages.com/id/628005070/photo/isolated-wet-hibiscus-flower-on-the-green-background.jpg?s=612x612&w=0&k=20&c=8XH9Y_a0a-GoMp6NCMrdEsy5O4wMiQb5ljRGL2dSRdU=",
-    "https://www.idyl.co.in/cdn/shop/articles/out-0_8a34cae2-a7c2-4781-ac4b-c8d886156736_1100x.png?v=1744568747",
-    "https://gardenerspath.com/wp-content/uploads/2020/03/Red-Hibiscus-Flowers-in-Bright-Sunshine.jpg",
-    "https://www.rainbowgardens.biz/wp-content/uploads/2026/04/stock-flowers-1-1-500x419.jpg",
-  ],
-  "indoor-plants": [
-    "https://hips.hearstapps.com/hmg-prod/images/peace-lily-plant-in-a-bright-home-royalty-free-image-1574380038.jpg?crop=0.536xw:1.00xh;0.167xw,0",
-    "https://hips.hearstapps.com/hmg-prod/images/bright-living-room-with-houseplant-on-a-cupboard-in-royalty-free-image-1574379918.jpg?crop=0.536xw:1.00xh;0.0765xw,0",
-    "https://images-na.ssl-images-amazon.com/images/I/61akL8tzhiL.jpg",
-    "https://images-na.ssl-images-amazon.com/images/I/61axynVqYxL.jpg",
-    "https://images-na.ssl-images-amazon.com/images/I/51Z-QO31m5L.jpg",
-    "https://floweraura-blog-img.s3.ap-south-1.amazonaws.com/plants-blog/Peace-Lily-M.jpg",
-  ],
-  "air-purifiers": [
-    "https://www.farmersalmanac.com/wp-content/uploads/2026/06/air-purifying-houseplants-living-room-collection.jpg",
-    "https://floweraura-blog-img.s3.ap-south-1.amazonaws.com/plants-blog/Peace-Lily-M.jpg",
-    "https://allaboutplanties.com/cdn/shop/files/peace-lily-hero-image-all-about-planties.png?v=1775711884&width=600",
-    "https://floweraura-blog-img.s3.ap-south-1.amazonaws.com/plants-blog/Peace-Lily-D.jpg",
-    "https://hips.hearstapps.com/hmg-prod/images/peace-lily-plant-in-a-bright-home-royalty-free-image-1574380038.jpg?crop=0.536xw:1.00xh;0.167xw,0",
-    "https://hips.hearstapps.com/hmg-prod/images/bright-living-room-with-houseplant-on-a-cupboard-in-royalty-free-image-1574379918.jpg?crop=0.536xw:1.00xh;0.0765xw,0",
-  ],
-  "medical-herbs": [
-    "https://blog.sfapp.magefan.top/media/urban-plant-india.myshopify.com/images/Medicinal%20Plants/1%20(1).webp",
-    "https://www.asiafarming.com/wp-content/uploads/2022/10/Medicinal-Plants_Herbs-Contract-Farming-in-India1-1024x683.jpg",
-    "https://www.asiafarming.com/wp-content/uploads/2022/10/Medicinal-Plants_Herbs-Contract-Farming-in-India5-1024x576.jpg",
-    "https://www.urbanplant.in/a/blog/media/urban-plant-india.myshopify.com/Post/featured_img/Add_a_subheading_(2)_(2).webp",
-    "https://www.asiafarming.com/wp-content/uploads/2022/10/Medicinal-Plants_Herbs-Contract-Farming-in-India4-1024x543.jpg",
-    "https://www.gardenia.net/wp-content/uploads/2023/05/flowers-and-herbs-for-rock-garden-300x300.webp",
-  ],
-  "outdoor-plants": [
-    "https://lirp.cdn-website.com/db534b0a/dms3rep/multi/opt/rosehill-palms-bougainvillea-barbara-karst-1920w.webp",
-    "https://lirp.cdn-website.com/db534b0a/dms3rep/multi/opt/rosehill-palms-bougainvillea-vera-deep-purple-1920w.webp",
-    "https://lirp.cdn-website.com/db534b0a/dms3rep/multi/opt/rosehill-palms-bougainvillea-white-madonna-1920w.webp",
-    "https://thumbs.dreamstime.com/b/egyptian-plants-flowers-flowering-bougainvillea-branch-background-palm-trees-68548895.jpg",
-    "https://gardenerspath.com/wp-content/uploads/2022/09/Orange-Bougainvillea-Cascading-over-a-Fence.jpg",
-    "https://www.gardendesign.com/pictures/images/320x320Exact_0x66/dream-team-s-portland-garden_6/hollywood-hibiscus-america-s-sweetheart-tropical-hibiscus-proven-winners_18799.jpg",
-  ],
-};
 
 // ─── product data ────────────────────────────────────────────────────────────
 
@@ -307,8 +242,7 @@ async function main() {
   console.log("Cleared existing products and reset ID sequence.");
 
   const rows = PRODUCTS.map((p) => {
-    const pool = IMAGE_POOLS[p.category] ?? IMAGE_POOLS["bloom-throughout-year"];
-    const imgs = pickImages(p.name, pool);
+    const imgs = pickImages(p.name);
     return {
       name:        p.name,
       description: p.description,
