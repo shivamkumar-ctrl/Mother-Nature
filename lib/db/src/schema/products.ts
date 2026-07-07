@@ -10,6 +10,7 @@ export const productsTable = pgTable("products", {
   category: text("category").notNull(),
   stock: integer("stock").notNull().default(0),
   imageUrl: text("image_url"),
+  imageUrls: text("image_urls"), // JSON array of image URLs
   featured: boolean("featured").notNull().default(false),
   careLevel: text("care_level"),
   sunlight: text("sunlight"),

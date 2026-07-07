@@ -61,6 +61,11 @@ export interface Product {
   stock: number;
   /** @nullable */
   imageUrl: string | null;
+  /**
+     * JSON-encoded array of image URLs
+     * @nullable
+     */
+  imageUrls?: string | null;
   featured?: boolean;
   /** @nullable */
   careLevel?: string | null;

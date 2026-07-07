@@ -936,6 +936,9 @@ components:
           type: integer
         imageUrl:
           type: [string, 'null']
+        imageUrls:
+          type: [string, 'null']
+          description: JSON-encoded array of image URLs
         featured:
           type: boolean
         careLevel:
