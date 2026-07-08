@@ -123,7 +123,7 @@ export default function Wishlist() {
                   <p className="text-sm text-muted-foreground capitalize mb-1">
                     {item.product?.category}
                   </p>
-                  <p className="font-medium mb-4">${item.product?.price.toFixed(2)}</p>
+                  <p className="font-medium mb-4">₹{item.product?.price.toFixed(2)}</p>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" className="flex-1 gap-2" asChild>
                       <Link href={`/product/${item.productId}`}>

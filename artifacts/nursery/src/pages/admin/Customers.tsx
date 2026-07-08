@@ -94,7 +94,7 @@ export default function AdminCustomers() {
                       {customer.totalOrders}
                     </td>
                     <td className="px-6 py-4 text-right font-medium">
-                      ${customer.totalSpent.toFixed(2)}
+                      ₹{customer.totalSpent.toFixed(2)}
                     </td>
                   </tr>
                 ))

@@ -7,7 +7,7 @@ import {
 } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
-import { DollarSign, ShoppingBag, Users, AlertTriangle, ArrowRight, Package } from "lucide-react";
+import { IndianRupee, ShoppingBag, Users, AlertTriangle, ArrowRight, Package } from "lucide-react";
 import { format } from "date-fns";
 
 export default function AdminDashboard() {
@@ -24,7 +24,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Total Revenue", value: stats ? `$${stats.totalRevenue.toFixed(2)}` : null, icon: DollarSign },
+          { label: "Total Revenue", value: stats ? `₹${stats.totalRevenue.toFixed(2)}` : null, icon: IndianRupee },
           { label: "Orders", value: stats?.totalOrders, icon: ShoppingBag },
           { label: "Customers", value: stats?.totalCustomers, icon: Users },
           { label: "Low Stock Items", value: stats?.lowStockCount, icon: AlertTriangle, warning: (stats?.lowStockCount || 0) > 0 }
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className="font-medium">${order.total.toFixed(2)}</div>
+                        <div className="font-medium">₹{order.total.toFixed(2)}</div>
                         <div className="text-xs text-muted-foreground capitalize">{order.status}</div>
                       </div>
                     </div>

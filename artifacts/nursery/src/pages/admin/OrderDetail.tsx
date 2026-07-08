@@ -89,7 +89,7 @@ export default function AdminOrderDetail() {
             Placed on {format(new Date(order.createdAt), "MMMM d, yyyy 'at' h:mm a")}
           </p>
         </div>
-        <div className="text-2xl font-medium">${order.total.toFixed(2)}</div>
+        <div className="text-2xl font-medium">₹{order.total.toFixed(2)}</div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -154,12 +154,12 @@ export default function AdminOrderDetail() {
                 <div>
                   <p className="font-medium">{item.productName}</p>
                   <p className="text-sm text-muted-foreground">
-                    Qty: {item.quantity} × ${item.unitPrice.toFixed(2)}
+                    Qty: {item.quantity} × ₹{item.unitPrice.toFixed(2)}
                   </p>
                 </div>
               </div>
               <div className="font-medium self-end sm:self-auto">
-                ${(item.unitPrice * item.quantity).toFixed(2)}
+                ₹{(item.unitPrice * item.quantity).toFixed(2)}
               </div>
             </div>
           ))}
@@ -167,15 +167,15 @@ export default function AdminOrderDetail() {
         <div className="bg-muted/30 p-6 flex flex-col items-end gap-2 border-t">
           <div className="flex justify-between w-full sm:w-64 text-sm text-muted-foreground">
             <span>Subtotal</span>
-            <span>${order.total.toFixed(2)}</span>
+            <span>₹{order.total.toFixed(2)}</span>
           </div>
           <div className="flex justify-between w-full sm:w-64 text-sm text-muted-foreground">
             <span>Shipping</span>
-            <span>$0.00</span>
+            <span>₹0.00</span>
           </div>
           <div className="flex justify-between w-full sm:w-64 text-base font-medium pt-2 border-t mt-2">
             <span>Total</span>
-            <span>${order.total.toFixed(2)}</span>
+            <span>₹{order.total.toFixed(2)}</span>
           </div>
         </div>
       </div>

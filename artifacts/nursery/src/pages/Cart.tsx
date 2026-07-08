@@ -135,7 +135,7 @@ export default function Cart() {
                             : `${item.product.stock} in stock`}
                         </p>
                       </div>
-                      <p className="font-medium">${item.product.price.toFixed(2)}</p>
+                      <p className="font-medium">₹{item.product.price.toFixed(2)}</p>
                     </div>
                     <div className="flex justify-between items-center mt-4">
                       <div className="flex items-center border rounded-md">
@@ -174,7 +174,7 @@ export default function Cart() {
                 <div className="space-y-3 mb-6 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>${cart.total.toFixed(2)}</span>
+                    <span>₹{cart.total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
@@ -182,7 +182,7 @@ export default function Cart() {
                   </div>
                   <div className="border-t pt-3 flex justify-between font-medium text-base">
                     <span>Total</span>
-                    <span>${cart.total.toFixed(2)}</span>
+                    <span>₹{cart.total.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -193,7 +193,6 @@ export default function Cart() {
                     </Label>
                     <Input
                       id="name"
-                      placeholder="Jane Doe"
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -205,7 +204,7 @@ export default function Cart() {
                     </Label>
                     <Textarea
                       id="address"
-                      placeholder="123 Garden Lane, City, State, ZIP"
+                      placeholder="Full Address"
                       required
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
@@ -218,7 +217,6 @@ export default function Cart() {
                     <Input
                       id="phone"
                       type="tel"
-                      placeholder="+1 (555) 000-0000"
                       required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}

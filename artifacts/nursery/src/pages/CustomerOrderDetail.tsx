@@ -125,7 +125,7 @@ export default function CustomerOrderDetail() {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-xl font-medium">${order.total.toFixed(2)}</div>
+            <div className="text-xl font-medium">₹{order.total.toFixed(2)}</div>
             {canCancel && (
               <Button
                 variant="destructive"
@@ -207,7 +207,7 @@ export default function CustomerOrderDetail() {
                   </div>
                 </div>
                 <div className="font-medium self-end sm:self-auto">
-                  ${(item.unitPrice * item.quantity).toFixed(2)}
+                  ₹{(item.unitPrice * item.quantity).toFixed(2)}
                 </div>
               </div>
             ))}
@@ -215,15 +215,15 @@ export default function CustomerOrderDetail() {
           <div className="bg-muted/30 p-6 flex flex-col items-end gap-2 border-t">
             <div className="flex justify-between w-full sm:w-64 text-sm text-muted-foreground">
               <span>Subtotal</span>
-              <span>${order.total.toFixed(2)}</span>
+              <span>₹{order.total.toFixed(2)}</span>
             </div>
             <div className="flex justify-between w-full sm:w-64 text-sm text-muted-foreground">
               <span>Shipping</span>
-              <span>$0.00</span>
+              <span>₹0.00</span>
             </div>
             <div className="flex justify-between w-full sm:w-64 text-base font-medium pt-2 border-t mt-2">
               <span>Total</span>
-              <span>${order.total.toFixed(2)}</span>
+              <span>₹{order.total.toFixed(2)}</span>
             </div>
           </div>
         </div>

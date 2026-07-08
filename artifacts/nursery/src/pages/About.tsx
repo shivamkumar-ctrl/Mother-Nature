@@ -1,6 +1,6 @@
 import React from "react";
 import { Layout } from "@/components/Layout";
-import { Leaf, MapPin, Clock, Phone, Mail } from "lucide-react";
+import { Leaf, User, MapPin, Clock, Phone, Mail } from "lucide-react";
 
 export default function About() {
   return (
@@ -59,7 +59,8 @@ export default function About() {
           <h2 className="font-serif text-2xl font-medium text-foreground mb-6">Visit or Contact Us</h2>
           <div className="space-y-4">
             {[
-              { icon: <MapPin className="h-5 w-5 text-primary" />,  text: "123 Green Lane, Garden City – 400001" },
+              { icon: <User className="h-5 w-5 text-primary" />,    text: "Hareram Singh" },
+              { icon: <MapPin className="h-5 w-5 text-primary" />,  text: "Main Road Bihta Chowk, Bihta – 801111" },
               { icon: <Clock className="h-5 w-5 text-primary" />,   text: "Mon – Sat: 9 AM – 7 PM  |  Sunday: 10 AM – 5 PM" },
               { icon: <Phone className="h-5 w-5 text-primary" />,   text: "+91 98765 43210" },
               { icon: <Mail className="h-5 w-5 text-primary" />,    text: "hello@mothernaturenursery.in" },

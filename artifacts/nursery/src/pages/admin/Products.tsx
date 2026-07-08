@@ -238,7 +238,7 @@ export default function AdminProducts() {
                       <span className="truncate max-w-[200px]">{product.name}</span>
                     </td>
                     <td className="px-6 py-4 capitalize">{product.category}</td>
-                    <td className="px-6 py-4 text-right">${product.price.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-right">₹{product.price.toFixed(2)}</td>
                     <td className="px-6 py-4 text-right">
                       <span className={`px-2 py-1 rounded text-xs font-bold ${product.stock <= 5 ? (product.stock === 0 ? 'bg-destructive/10 text-destructive' : 'bg-secondary/10 text-secondary') : ''}`}>
                         {product.stock}

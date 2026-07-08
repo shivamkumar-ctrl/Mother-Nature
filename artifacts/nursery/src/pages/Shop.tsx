@@ -192,7 +192,7 @@ export default function Shop() {
                       <h3 className="font-serif text-lg font-medium text-foreground group-hover:text-primary transition-colors">{product.name}</h3>
                       <p className="text-sm text-muted-foreground capitalize">{product.category}</p>
                     </div>
-                    <p className="font-medium">${product.price.toFixed(2)}</p>
+                    <p className="font-medium">₹{product.price.toFixed(2)}</p>
                   </div>
                 </Link>
                 );

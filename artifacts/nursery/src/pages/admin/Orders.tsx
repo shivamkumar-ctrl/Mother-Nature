@@ -140,7 +140,7 @@ export default function AdminOrders() {
                         <div className="text-xs text-muted-foreground">{order.customerEmail || "No email provided"}</div>
                       </Link>
                     </td>
-                    <td className="px-6 py-4 text-right font-medium">${order.total.toFixed(2)}</td>
+                    <td className="px-6 py-4 text-right font-medium">₹{order.total.toFixed(2)}</td>
                     <td className="px-6 py-4 text-center">
                       <Badge variant="outline" className={`${getStatusColor(order.status)} capitalize`}>
                         {order.status}

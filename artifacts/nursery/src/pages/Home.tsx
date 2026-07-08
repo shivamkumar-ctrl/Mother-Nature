@@ -110,7 +110,7 @@ export default function Home() {
                   )}
                 </div>
                 <h3 className="font-serif text-lg font-medium text-foreground group-hover:text-primary transition-colors">{product.name}</h3>
-                <p className="text-muted-foreground">${(product.price).toFixed(2)}</p>
+                <p className="text-muted-foreground">₹{(product.price).toFixed(2)}</p>
               </Link>
             ))}
           </div>

@@ -69,7 +69,7 @@ export default function CustomerOrders() {
                     </p>
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
-                    <span className="font-medium">${order.total.toFixed(2)}</span>
+                    <span className="font-medium">₹{order.total.toFixed(2)}</span>
                     <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
                 </div>

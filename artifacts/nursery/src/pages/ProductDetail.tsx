@@ -431,7 +431,7 @@ export default function ProductDetail() {
             {product.category}
           </div>
           <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4">{product.name}</h1>
-          <p className="text-2xl font-medium mb-6">${product.price.toFixed(2)}</p>
+          <p className="text-2xl font-medium mb-6">₹{product.price.toFixed(2)}</p>
 
           <div className="prose prose-stone mb-8 text-muted-foreground">
             <p>{product.description}</p>
