@@ -139,6 +139,8 @@ export interface CartItemUpdate {
 export interface CheckoutInput {
   shippingAddress: string;
   phoneNumber: string;
+  /** @minLength 1 */
+  customerName: string;
   notes?: string;
 }
 
@@ -204,6 +206,8 @@ export interface Customer {
   firstName: string | null;
   /** @nullable */
   lastName: string | null;
+  /** @nullable */
+  name: string | null;
   /** @nullable */
   profileImageUrl?: string | null;
   totalOrders: number;

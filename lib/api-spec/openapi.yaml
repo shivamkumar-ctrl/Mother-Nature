@@ -521,6 +521,49 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
 
+  /orders/{id}/delete:
+    post:
+      tags: [orders]
+      operationId: deleteOrder
+      summary: Delete a cancelled order (owner only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Order deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Order is not cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
   /orders/{id}/status:
     patch:
       tags: [orders]
@@ -1062,12 +1105,15 @@ components:
 
     CheckoutInput:
       type: object
-      required: [shippingAddress, phoneNumber]
+      required: [shippingAddress, phoneNumber, customerName]
       properties:
         shippingAddress:
           type: string
         phoneNumber:
           type: string
+        customerName:
+          type: string
+          minLength: 1
         notes:
           type: string
 
@@ -1132,7 +1178,7 @@ components:
 
     Customer:
       type: object
-      required: [id, email, firstName, lastName, totalOrders, totalSpent, createdAt]
+      required: [id, email, firstName, lastName, name, totalOrders, totalSpent, createdAt]
       properties:
         id:
           type: string
@@ -1141,6 +1187,8 @@ components:
         firstName:
           type: [string, 'null']
         lastName:
+          type: [string, 'null']
+        name:
           type: [string, 'null']
         profileImageUrl:
           type: [string, 'null']

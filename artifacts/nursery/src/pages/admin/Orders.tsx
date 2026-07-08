@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
 import { AdminLayout } from "@/components/AdminLayout";
-import { useListOrders, getListOrdersQueryKey, useUpdateOrderStatus } from "@workspace/api-client-react";
+import { useListOrders, getListOrdersQueryKey, useUpdateOrderStatus, useDeleteOrder } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { Package } from "lucide-react";
+import { Package, Trash2 } from "lucide-react";
 import type { OrderStatusUpdateStatus } from "@workspace/api-client-react";
 
 export default function AdminOrders() {
@@ -19,6 +20,7 @@ export default function AdminOrders() {
   );
   
   const updateStatus = useUpdateOrderStatus();
+  const deleteOrder = useDeleteOrder();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -30,6 +32,22 @@ export default function AdminOrders() {
       },
       onError: () => {
         toast({ title: "Failed to update status", variant: "destructive" });
+      }
+    });
+  };
+
+  const handleDelete = (orderId: number) => {
+    if (!window.confirm(`Delete order #${orderId}? This cannot be undone.`)) {
+      return;
+    }
+    deleteOrder.mutate({ id: orderId }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListOrdersQueryKey() });
+        toast({ title: "Order deleted" });
+      },
+      onError: (err: unknown) => {
+        const msg = (err as { message?: string })?.message ?? "Failed to delete order";
+        toast({ title: msg, variant: "destructive" });
       }
     });
   };
@@ -79,6 +97,7 @@ export default function AdminOrders() {
                 <th className="px-6 py-4 text-right">Total</th>
                 <th className="px-6 py-4 text-center">Status</th>
                 <th className="px-6 py-4">Update Status</th>
+                <th className="px-6 py-4"></th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -94,11 +113,12 @@ export default function AdminOrders() {
                     <td className="px-6 py-4"><Skeleton className="h-5 w-16 ml-auto" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-6 w-20 mx-auto rounded-full" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-9 w-32" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-9 w-9" /></td>
                   </tr>
                 ))
               ) : orders?.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                     <Package className="h-8 w-8 mx-auto mb-2 opacity-20" />
                     No orders found
                   </td>
@@ -143,6 +163,20 @@ export default function AdminOrders() {
                           <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
                       </Select>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      {order.status === "cancelled" && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDelete(order.id)}
+                          disabled={deleteOrder.isPending && deleteOrder.variables?.id === order.id}
+                          aria-label={`Delete order #${order.id}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))

@@ -7,6 +7,7 @@ import {
   UpdateOrderStatusParams,
   UpdateOrderStatusBody,
   CancelOrderParams,
+  DeleteOrderParams,
 } from "@workspace/api-zod";
 import { isOwner } from "./products";
 
@@ -137,6 +138,43 @@ router.patch("/orders/:id/status", async (req, res): Promise<void> => {
     .returning();
 
   res.json(await buildOrderResponse(order));
+});
+
+router.post("/orders/:id/delete", async (req, res): Promise<void> => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  if (!isOwner(req.user.id, req.user.email)) {
+    res.status(403).json({ error: "Forbidden: owner only" });
+    return;
+  }
+
+  const params = DeleteOrderParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const [order] = await db
+    .select()
+    .from(ordersTable)
+    .where(eq(ordersTable.id, params.data.id));
+
+  if (!order) {
+    res.status(404).json({ error: "Order not found" });
+    return;
+  }
+
+  if (order.status !== "cancelled") {
+    res.status(400).json({ error: "Only cancelled orders can be deleted" });
+    return;
+  }
+
+  await db.delete(ordersTable).where(eq(ordersTable.id, params.data.id));
+
+  res.json({ success: true });
 });
 
 router.post("/orders/:id/cancel", async (req, res): Promise<void> => {

@@ -265,7 +265,7 @@ router.post("/cart/checkout", async (req, res): Promise<void> => {
     .insert(ordersTable)
     .values({
       userId: req.user.id,
-      customerName: `${req.user.firstName ?? ""} ${req.user.lastName ?? ""}`.trim() || null,
+      customerName: parsed.data.customerName,
       customerEmail: req.user.email ?? null,
       phoneNumber: parsed.data.phoneNumber,
       status: "pending",

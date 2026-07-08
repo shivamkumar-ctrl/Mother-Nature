@@ -409,9 +409,13 @@ export const RemoveFromCartResponse = zod.object({
 /**
  * @summary Checkout the cart and create an order
  */
+
+
+
 export const CheckoutCartBody = zod.object({
   "shippingAddress": zod.string(),
   "phoneNumber": zod.string(),
+  "customerName": zod.string().min(1),
   "notes": zod.string().optional()
 })
 
@@ -501,6 +505,18 @@ export const GetOrderResponse = zod.object({
 
 
 /**
+ * @summary Delete a cancelled order (owner only)
+ */
+export const DeleteOrderParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteOrderResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
  * @summary Update order status (owner only)
  */
 export const UpdateOrderStatusParams = zod.object({
@@ -576,6 +592,7 @@ export const ListCustomersResponseItem = zod.object({
   "email": zod.string().nullable(),
   "firstName": zod.string().nullable(),
   "lastName": zod.string().nullable(),
+  "name": zod.string().nullable(),
   "profileImageUrl": zod.string().nullish(),
   "totalOrders": zod.number(),
   "totalSpent": zod.number(),
@@ -596,6 +613,7 @@ export const GetCustomerResponse = zod.object({
   "email": zod.string().nullable(),
   "firstName": zod.string().nullable(),
   "lastName": zod.string().nullable(),
+  "name": zod.string().nullable(),
   "profileImageUrl": zod.string().nullish(),
   "totalOrders": zod.number(),
   "totalSpent": zod.number(),

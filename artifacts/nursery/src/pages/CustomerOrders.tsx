@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { Layout } from "@/components/Layout";
 import { useListOrders, getListOrdersQueryKey } from "@workspace/api-client-react";
+import { useAuth } from "@workspace/replit-auth-web";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { Package, ChevronRight } from "lucide-react";
@@ -9,6 +10,13 @@ import { Badge } from "@/components/ui/badge";
 
 export default function CustomerOrders() {
   const { data: orders, isLoading } = useListOrders({}, { query: { queryKey: getListOrdersQueryKey({}) } });
+  const { user } = useAuth();
+
+  const orderNumberById = new Map(
+    [...(orders ?? [])]
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      .map((o, idx) => [o.id, idx + 1])
+  );
 
   const getStatusColor = (status: string) => {
     switch(status) {
@@ -51,7 +59,7 @@ export default function CustomerOrders() {
                 <div className="bg-card border rounded-xl p-4 sm:p-6 hover:shadow-md transition-shadow flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
                   <div>
                     <div className="flex items-center gap-3 mb-1">
-                      <span className="font-medium">Order #{order.id}</span>
+                      <span className="font-medium">Order #{user?.isOwner ? order.id : orderNumberById.get(order.id)}</span>
                       <Badge variant="secondary" className={`${getStatusColor(order.status)} border-0 capitalize`}>
                         {order.status}
                       </Badge>

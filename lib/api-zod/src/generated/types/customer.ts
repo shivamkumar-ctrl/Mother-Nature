@@ -15,6 +15,8 @@ export interface Customer {
   /** @nullable */
   lastName: string | null;
   /** @nullable */
+  name: string | null;
+  /** @nullable */
   profileImageUrl?: string | null;
   totalOrders: number;
   totalSpent: number;

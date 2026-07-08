@@ -9,5 +9,7 @@
 export interface CheckoutInput {
   shippingAddress: string;
   phoneNumber: string;
+  /** @minLength 1 */
+  customerName: string;
   notes?: string;
 }

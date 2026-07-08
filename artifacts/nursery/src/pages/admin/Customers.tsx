@@ -27,7 +27,7 @@ export default function AdminCustomers() {
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
-              placeholder="Search customers by email..." 
+              placeholder="Search customers by name or email..." 
               className="pl-9 bg-background"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -40,6 +40,7 @@ export default function AdminCustomers() {
             <thead className="bg-muted/50 text-muted-foreground text-xs uppercase font-medium">
               <tr>
                 <th className="px-6 py-4">Customer</th>
+                <th className="px-6 py-4">Name</th>
                 <th className="px-6 py-4">Joined</th>
                 <th className="px-6 py-4 text-center">Orders</th>
                 <th className="px-6 py-4 text-right">Total Spent</th>
@@ -57,13 +58,14 @@ export default function AdminCustomers() {
                       </div>
                     </td>
                     <td className="px-6 py-4"><Skeleton className="h-5 w-24" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-5 w-24" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-5 w-8 mx-auto" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-5 w-16 ml-auto" /></td>
                   </tr>
                 ))
               ) : customers?.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
                     <Users className="h-8 w-8 mx-auto mb-2 opacity-20" />
                     No customers found
                   </td>
@@ -73,7 +75,7 @@ export default function AdminCustomers() {
                   <tr key={customer.id} className="hover:bg-muted/30 transition-colors">
                     <td className="px-6 py-4 flex items-center gap-3">
                       <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold font-serif uppercase text-xs flex-shrink-0">
-                        {customer.firstName?.[0] || customer.email?.[0] || '?'}
+                        {customer.name?.[0] || customer.firstName?.[0] || customer.email?.[0] || '?'}
                       </div>
                       <div>
                         <div className="font-medium text-foreground">
@@ -81,6 +83,9 @@ export default function AdminCustomers() {
                         </div>
                         <div className="text-xs text-muted-foreground">{customer.email}</div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 font-medium text-foreground">
+                      {customer.name || <span className="text-muted-foreground">—</span>}
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
                       {format(new Date(customer.createdAt), 'MMM d, yyyy')}

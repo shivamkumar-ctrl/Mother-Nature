@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
 import { useGetCart, getGetCartQueryKey, useUpdateCartItem, useRemoveFromCart, useCheckoutCart } from "@workspace/api-client-react";
@@ -10,6 +10,7 @@ import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@workspace/replit-auth-web";
 
 export default function Cart() {
   const { data: cart, isLoading } = useGetCart({ query: { queryKey: getGetCartQueryKey() } });
@@ -19,10 +20,20 @@ export default function Cart() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
 
+  const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    if (!name && user) {
+      const fullName = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
+      if (fullName) setName(fullName);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleUpdateQuantity = (productId: number, quantity: number) => {
     updateItem.mutate({ productId, data: { quantity } }, {
@@ -41,6 +52,10 @@ export default function Cart() {
 
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name.trim()) {
+      toast({ title: "Full name is required", variant: "destructive" });
+      return;
+    }
     if (!address.trim()) {
       toast({ title: "Shipping address is required", variant: "destructive" });
       return;
@@ -50,7 +65,7 @@ export default function Cart() {
       return;
     }
 
-    checkout.mutate({ data: { shippingAddress: address, phoneNumber: phone, notes } }, {
+    checkout.mutate({ data: { customerName: name, shippingAddress: address, phoneNumber: phone, notes } }, {
       onSuccess: (order) => {
         queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
         toast({ title: "Order placed successfully!" });
@@ -172,6 +187,18 @@ export default function Cart() {
                 </div>
 
                 <form onSubmit={handleCheckout} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">
+                      Full Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="name"
+                      placeholder="Jane Doe"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="address">
                       Shipping Address <span className="text-destructive">*</span>
