@@ -180,6 +180,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isProgrammaticScroll = useRef(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAuthenticated } = useAuth();
@@ -198,6 +200,32 @@ export default function ProductDetail() {
   const removeFromWishlist = useRemoveFromWishlist();
 
   const images = product ? getImages(product) : [];
+
+  useEffect(() => {
+    setSelectedIdx(0);
+    if (scrollRef.current) scrollRef.current.scrollLeft = 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId]);
+
+  const scrollToIdx = (i: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    isProgrammaticScroll.current = true;
+    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+    window.setTimeout(() => { isProgrammaticScroll.current = false; }, 400);
+  };
+
+  const goToIdx = (i: number) => {
+    setSelectedIdx(i);
+    scrollToIdx(i);
+  };
+
+  const handleGalleryScroll = () => {
+    const el = scrollRef.current;
+    if (!el || isProgrammaticScroll.current) return;
+    const i = Math.round(el.scrollLeft / el.clientWidth);
+    setSelectedIdx((prev) => (prev === i ? prev : i));
+  };
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
@@ -284,7 +312,7 @@ export default function ProductDetail() {
           images={images}
           index={selectedIdx}
           onClose={() => setLightboxOpen(false)}
-          onNav={setSelectedIdx}
+          onNav={goToIdx}
         />
       )}
 
@@ -305,44 +333,58 @@ export default function ProductDetail() {
           <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-muted shadow-lg group">
             {images.length > 0 ? (
               <>
-                <img
-                  src={images[selectedIdx]}
-                  alt={product.name}
-                  className="object-cover w-full h-full cursor-zoom-in transition-transform duration-300 group-hover:scale-105"
-                  onClick={() => setLightboxOpen(true)}
-                />
+                <div
+                  ref={scrollRef}
+                  onScroll={handleGalleryScroll}
+                  className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                >
+                  {images.map((src, i) => (
+                    <img
+                      key={i}
+                      src={src}
+                      alt={`${product.name} ${i + 1}`}
+                      className="object-cover w-full h-full flex-shrink-0 snap-center cursor-zoom-in transition-transform duration-300 md:group-hover:scale-105"
+                      onClick={() => { setSelectedIdx(i); setLightboxOpen(true); }}
+                      draggable={false}
+                    />
+                  ))}
+                </div>
                 {/* Zoom hint */}
-                <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/50 text-white text-xs px-2.5 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/50 text-white text-xs px-2.5 py-1.5 rounded-full opacity-0 md:group-hover:opacity-100 transition-opacity pointer-events-none">
                   <ZoomIn className="h-3.5 w-3.5" /> Tap to zoom
                 </div>
-                {/* Prev / Next arrows over main image */}
+                {/* Prev / Next arrows over main image (desktop) */}
                 {images.length > 1 && (
                   <>
                     <button
-                      onClick={() => setSelectedIdx((i) => (i - 1 + images.length) % images.length)}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => goToIdx((selectedIdx - 1 + images.length) % images.length)}
+                      className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 items-center justify-center rounded-full bg-white/80 hover:bg-white shadow text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
                     <button
-                      onClick={() => setSelectedIdx((i) => (i + 1) % images.length)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => goToIdx((selectedIdx + 1) % images.length)}
+                      className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 items-center justify-center rounded-full bg-white/80 hover:bg-white shadow text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>
                   </>
                 )}
-                {/* Dot indicators (mobile) */}
+                {/* Swipe hint + dot indicators (mobile) */}
                 {images.length > 1 && (
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 md:hidden">
-                    {images.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setSelectedIdx(i)}
-                        className={`h-2 w-2 rounded-full transition-all ${i === selectedIdx ? "bg-white w-4" : "bg-white/50"}`}
-                      />
-                    ))}
-                  </div>
+                  <>
+                    <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[11px] px-2.5 py-1 rounded-full md:hidden pointer-events-none">
+                      Swipe to see more
+                    </div>
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 md:hidden pointer-events-none">
+                      {images.map((_, i) => (
+                        <span
+                          key={i}
+                          className={`h-2 w-2 rounded-full transition-all ${i === selectedIdx ? "bg-white w-4" : "bg-white/50"}`}
+                        />
+                      ))}
+                    </div>
+                  </>
                 )}
               </>
             ) : (
@@ -369,7 +411,7 @@ export default function ProductDetail() {
               {images.map((src, i) => (
                 <button
                   key={i}
-                  onClick={() => setSelectedIdx(i)}
+                  onClick={() => goToIdx(i)}
                   className={`flex-1 aspect-square rounded-xl overflow-hidden border-2 transition-all ${
                     i === selectedIdx
                       ? "border-primary shadow-md scale-105"
