@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { IndianRupee, ShoppingBag, Users, AlertTriangle, ArrowRight, Package } from "lucide-react";
 import { format } from "date-fns";
+import { StoreQRCode } from "@/components/StoreQRCode";
 
 export default function AdminDashboard() {
   const { data: stats, isLoading: statsLoading } = useGetDashboardStats({ query: { queryKey: getGetDashboardStatsQueryKey() } });
@@ -113,6 +114,18 @@ export default function AdminDashboard() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        <div className="lg:col-span-3 bg-card rounded-xl border shadow-sm overflow-hidden">
+          <div className="p-6 border-b bg-muted/20">
+            <h2 className="font-serif text-xl font-medium">Store QR Code</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Print this on packaging, flyers, or in-store signage so customers can scan it and shop online.
+            </p>
+          </div>
+          <div className="p-6 flex justify-center sm:justify-start">
+            <StoreQRCode size={160} showDownload />
           </div>
         </div>
       </div>

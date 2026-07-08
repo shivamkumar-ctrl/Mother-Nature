@@ -1,6 +1,7 @@
 import React from "react";
 import { Layout } from "@/components/Layout";
 import { Leaf, User, MapPin, Clock, Phone, Mail } from "lucide-react";
+import { StoreQRCode } from "@/components/StoreQRCode";
 
 export default function About() {
   return (
@@ -71,6 +72,15 @@ export default function About() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Scan to visit */}
+        <section className="mt-12 text-center">
+          <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Scan to Visit Us Online</h2>
+          <p className="text-muted-foreground mb-6">
+            Point your phone's camera at this code to open our shop right in your browser.
+          </p>
+          <StoreQRCode size={180} />
         </section>
       </div>
     </Layout>
