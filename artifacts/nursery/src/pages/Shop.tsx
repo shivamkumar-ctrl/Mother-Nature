@@ -160,8 +160,15 @@ export default function Shop() {
                 </Button>
               </div>
             ) : (
-              products?.map((product) => (
-                <Link key={product.id} href={`/product/${product.id}`} className="group block">
+              products?.map((product) => {
+                const bareSearch = searchStr.startsWith("?") ? searchStr.slice(1) : searchStr;
+                const productHref = `/product/${product.id}${bareSearch ? `?from=${encodeURIComponent(bareSearch)}` : ""}`;
+                return (
+                <Link
+                  key={product.id}
+                  href={productHref}
+                  className="group block"
+                >
                   <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-muted mb-4 shadow-sm group-hover:shadow-md transition-all">
                     {product.imageUrl ? (
                       <img 
@@ -188,7 +195,8 @@ export default function Shop() {
                     <p className="font-medium">${product.price.toFixed(2)}</p>
                   </div>
                 </Link>
-              ))
+                );
+              })
             )}
           </div>
         </div>

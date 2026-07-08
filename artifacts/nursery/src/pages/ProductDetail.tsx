@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useParams, Link } from "wouter";
+import { useParams, useSearch, Link } from "wouter";
 import { Layout } from "@/components/Layout";
 import {
   useGetProduct,
@@ -172,6 +172,11 @@ function Lightbox({ images, index, onClose, onNav }: LightboxProps) {
 export default function ProductDetail() {
   const { id } = useParams();
   const productId = parseInt(id || "0");
+  const searchStr = useSearch();
+  const backToShopHref = (() => {
+    const fromQuery = new URLSearchParams(searchStr).get("from");
+    return fromQuery ? `/shop?${fromQuery}` : "/shop";
+  })();
   const [quantity, setQuantity] = useState(1);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -266,7 +271,7 @@ export default function ProductDetail() {
       <Layout>
         <div className="container mx-auto px-4 py-24 text-center">
           <h2 className="text-2xl font-serif text-primary mb-4">Product not found</h2>
-          <Link href="/shop" className="text-secondary hover:underline">Return to shop</Link>
+          <Link href={backToShopHref} className="text-secondary hover:underline">Return to shop</Link>
         </div>
       </Layout>
     );
@@ -285,7 +290,7 @@ export default function ProductDetail() {
 
       <div className="bg-muted/30 border-b">
         <div className="container mx-auto px-4 py-4">
-          <Link href="/shop" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+          <Link href={backToShopHref} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
             <ArrowLeft className="h-4 w-4" /> Back to Shop
           </Link>
         </div>
