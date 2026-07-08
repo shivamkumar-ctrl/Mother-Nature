@@ -218,6 +218,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                       <Link
                         key={slug}
                         href={`/shop?category=${slug}`}
+                        onClick={() => { setMobileMenuOpen(false); setMobilePlantsOpen(false); }}
                         className="block px-2 py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
                       >
                         {label}
@@ -232,6 +233,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Link
                   key={href}
                   href={href}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={`block px-3 py-2.5 text-sm font-medium rounded-md hover:bg-muted transition-colors ${location === href || location.startsWith(href.split("?")[0]) ? "text-primary" : "text-foreground"}`}
                 >
                   {label}

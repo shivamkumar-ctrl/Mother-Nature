@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link, useSearch } from "wouter";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useSearch } from "wouter";
 import { Layout } from "@/components/Layout";
 import { useListProducts, getListProductsQueryKey } from "@workspace/api-client-react";
 import { Input } from "@/components/ui/input";
@@ -24,19 +24,47 @@ const CATEGORIES = [
 
 export default function Shop() {
   const searchStr = useSearch();
+  const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(() => {
     const params = new URLSearchParams(searchStr);
     const cat = params.get("category") || "all";
     return CATEGORIES.some((c) => c.value === cat) ? cat : "all";
   });
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchBoxRef = useRef<HTMLDivElement>(null);
 
-  // Re-sync when the URL query changes (e.g. clicking a navbar subcategory)
+  // Re-sync when the URL query changes (e.g. clicking a navbar subcategory, or navigating back)
   useEffect(() => {
     const params = new URLSearchParams(searchStr);
     const cat = params.get("category") || "all";
     setCategory(CATEGORIES.some((c) => c.value === cat) ? cat : "all");
   }, [searchStr]);
+
+  // Keep the URL in sync with the selected category so the back button
+  // returns to the same filtered view (e.g. after visiting a product page).
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    const params = new URLSearchParams(searchStr);
+    if (value === "all") {
+      params.delete("category");
+    } else {
+      params.set("category", value);
+    }
+    const qs = params.toString();
+    navigate(`/shop${qs ? `?${qs}` : ""}`);
+  };
+
+  // Hide the search suggestions dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const { data: products, isLoading } = useListProducts(
     {
@@ -45,6 +73,8 @@ export default function Shop() {
     },
     { query: { queryKey: getListProductsQueryKey({ search: search || undefined, category: category !== "all" ? category : undefined }) } }
   );
+
+  const suggestions = search.trim().length > 0 ? (products ?? []).slice(0, 6) : [];
 
   return (
     <Layout>
@@ -64,20 +94,41 @@ export default function Shop() {
         <aside className="w-full md:w-64 space-y-6 flex-shrink-0">
           <div className="space-y-4">
             <h3 className="font-serif text-lg border-b pb-2">Search</h3>
-            <div className="relative">
+            <div className="relative" ref={searchBoxRef}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search plants..." 
                 className="pl-9"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => { setSearch(e.target.value); setShowSuggestions(true); }}
+                onFocus={() => { if (search.trim().length > 0) setShowSuggestions(true); }}
+                autoComplete="off"
               />
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute left-0 right-0 top-full mt-1 z-20 bg-card border rounded-md shadow-lg py-1 max-h-72 overflow-auto">
+                  {suggestions.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => { setSearch(p.name); setShowSuggestions(false); }}
+                      className="w-full flex items-center gap-2 text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
+                    >
+                      {p.imageUrl ? (
+                        <img src={p.imageUrl} alt="" className="h-7 w-7 rounded object-cover flex-shrink-0" />
+                      ) : (
+                        <span className="h-7 w-7 rounded bg-accent/50 flex-shrink-0" />
+                      )}
+                      <span className="truncate">{p.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
           <div className="space-y-4">
             <h3 className="font-serif text-lg border-b pb-2">Category</h3>
-            <Select value={category} onValueChange={setCategory}>
+            <Select value={category} onValueChange={handleCategoryChange}>
               <SelectTrigger>
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -104,7 +155,7 @@ export default function Shop() {
             ) : products?.length === 0 ? (
               <div className="col-span-full py-12 text-center">
                 <p className="text-lg text-muted-foreground">No plants found matching your search.</p>
-                <Button variant="outline" className="mt-4" onClick={() => { setSearch(""); setCategory("all"); }}>
+                <Button variant="outline" className="mt-4" onClick={() => { setSearch(""); setShowSuggestions(false); handleCategoryChange("all"); }}>
                   Clear Filters
                 </Button>
               </div>
