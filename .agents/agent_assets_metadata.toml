@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "KrIvqpUll1mVlifhwhn3S"
+uri = "file://exports/bloom-and-root-nursery-source.zip"
+type = "unspecified"
+title = "Bloom & Root Nursery — Full Source Code"
