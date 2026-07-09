@@ -6,3 +6,9 @@ id = "KrIvqpUll1mVlifhwhn3S"
 uri = "file://exports/bloom-and-root-nursery-source.zip"
 type = "unspecified"
 title = "Bloom & Root Nursery — Full Source Code"
+
+[[outputs]]
+id = "o52Et507QZhD3M51ZfGw6"
+uri = "file://docs/ARCHITECTURE.md"
+type = "text"
+title = "Bloom & Root Nursery — Architecture & Code Flow"
