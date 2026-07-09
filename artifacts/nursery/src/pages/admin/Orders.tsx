@@ -94,6 +94,8 @@ export default function AdminOrders() {
                 <th className="px-6 py-4">Order ID</th>
                 <th className="px-6 py-4">Date</th>
                 <th className="px-6 py-4">Customer</th>
+                <th className="px-6 py-4">Mobile Number</th>
+                <th className="px-6 py-4">Address</th>
                 <th className="px-6 py-4 text-right">Total</th>
                 <th className="px-6 py-4 text-center">Status</th>
                 <th className="px-6 py-4">Update Status</th>
@@ -110,6 +112,8 @@ export default function AdminOrders() {
                       <Skeleton className="h-5 w-32 mb-1" />
                       <Skeleton className="h-4 w-24" />
                     </td>
+                    <td className="px-6 py-4"><Skeleton className="h-5 w-24" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-5 w-40" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-5 w-16 ml-auto" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-6 w-20 mx-auto rounded-full" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-9 w-32" /></td>
@@ -118,7 +122,7 @@ export default function AdminOrders() {
                 ))
               ) : orders?.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={9} className="px-6 py-12 text-center text-muted-foreground">
                     <Package className="h-8 w-8 mx-auto mb-2 opacity-20" />
                     No orders found
                   </td>
@@ -139,6 +143,12 @@ export default function AdminOrders() {
                         <div className="font-medium">{order.customerName || "Guest"}</div>
                         <div className="text-xs text-muted-foreground">{order.customerEmail || "No email provided"}</div>
                       </Link>
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
+                      {order.phoneNumber || <span className="text-muted-foreground">—</span>}
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground max-w-[240px] truncate" title={order.shippingAddress ?? undefined}>
+                      {order.shippingAddress || <span className="text-muted-foreground">—</span>}
                     </td>
                     <td className="px-6 py-4 text-right font-medium">₹{order.total.toFixed(2)}</td>
                     <td className="px-6 py-4 text-center">

@@ -218,6 +218,10 @@ export interface Customer {
   /** @nullable */
   name: string | null;
   /** @nullable */
+  phoneNumber?: string | null;
+  /** @nullable */
+  shippingAddress?: string | null;
+  /** @nullable */
   profileImageUrl?: string | null;
   totalOrders: number;
   totalSpent: number;

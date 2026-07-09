@@ -46,12 +46,16 @@ router.get("/customers", async (req, res): Promise<void> => {
         `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() ??
         null;
 
+      const latestOrder = orders[0];
+
       return {
         id: u.id,
         email: u.email,
         firstName: u.firstName,
         lastName: u.lastName,
         name: name || null,
+        phoneNumber: latestOrder?.phoneNumber ?? null,
+        shippingAddress: latestOrder?.shippingAddress ?? null,
         profileImageUrl: u.profileImageUrl,
         totalOrders: orders.length,
         totalSpent: Math.round(totalSpent * 100) / 100,
@@ -114,12 +118,16 @@ router.get("/customers/:id", async (req, res): Promise<void> => {
     `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() ??
     null;
 
+  const latestOrder = orders[0];
+
   res.json({
     id: user.id,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
     name: name || null,
+    phoneNumber: latestOrder?.phoneNumber ?? null,
+    shippingAddress: latestOrder?.shippingAddress ?? null,
     profileImageUrl: user.profileImageUrl,
     totalOrders: orders.length,
     totalSpent: Math.round(totalSpent * 100) / 100,

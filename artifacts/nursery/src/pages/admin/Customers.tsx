@@ -41,6 +41,8 @@ export default function AdminCustomers() {
               <tr>
                 <th className="px-6 py-4">Customer</th>
                 <th className="px-6 py-4">Name</th>
+                <th className="px-6 py-4">Mobile Number</th>
+                <th className="px-6 py-4">Address</th>
                 <th className="px-6 py-4">Joined</th>
                 <th className="px-6 py-4 text-center">Orders</th>
                 <th className="px-6 py-4 text-right">Total Spent</th>
@@ -58,6 +60,8 @@ export default function AdminCustomers() {
                       </div>
                     </td>
                     <td className="px-6 py-4"><Skeleton className="h-5 w-24" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-5 w-28" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-5 w-40" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-5 w-24" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-5 w-8 mx-auto" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-5 w-16 ml-auto" /></td>
@@ -65,7 +69,7 @@ export default function AdminCustomers() {
                 ))
               ) : customers?.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                     <Users className="h-8 w-8 mx-auto mb-2 opacity-20" />
                     No customers found
                   </td>
@@ -86,6 +90,12 @@ export default function AdminCustomers() {
                     </td>
                     <td className="px-6 py-4 font-medium text-foreground">
                       {customer.name || <span className="text-muted-foreground">—</span>}
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
+                      {customer.phoneNumber || <span className="text-muted-foreground">—</span>}
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground max-w-[240px] truncate" title={customer.shippingAddress ?? undefined}>
+                      {customer.shippingAddress || <span className="text-muted-foreground">—</span>}
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
                       {format(new Date(customer.createdAt), 'MMM d, yyyy')}
