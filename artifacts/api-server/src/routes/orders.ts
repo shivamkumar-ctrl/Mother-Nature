@@ -62,6 +62,28 @@ router.get("/orders", async (req, res): Promise<void> => {
   res.json(result);
 });
 
+router.get("/orders/last-shipping-info", async (req, res): Promise<void> => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const [lastOrder] = await db
+    .select({
+      customerName: ordersTable.customerName,
+      shippingAddress: ordersTable.shippingAddress,
+      phoneNumber: ordersTable.phoneNumber,
+    })
+    .from(ordersTable)
+    .where(eq(ordersTable.userId, req.user.id))
+    .orderBy(desc(ordersTable.createdAt))
+    .limit(1);
+
+  res.json(
+    lastOrder ?? { customerName: null, shippingAddress: null, phoneNumber: null }
+  );
+});
+
 router.get("/orders/:id", async (req, res): Promise<void> => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Unauthorized" });

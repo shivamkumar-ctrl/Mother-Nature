@@ -183,6 +183,15 @@ export interface Order {
   updatedAt: string;
 }
 
+export interface LastShippingInfo {
+  /** @nullable */
+  customerName?: string | null;
+  /** @nullable */
+  shippingAddress?: string | null;
+  /** @nullable */
+  phoneNumber?: string | null;
+}
+
 export type OrderStatusUpdateStatus = typeof OrderStatusUpdateStatus[keyof typeof OrderStatusUpdateStatus];
 
 

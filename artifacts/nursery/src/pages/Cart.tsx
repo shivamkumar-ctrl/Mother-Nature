@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Layout } from "@/components/Layout";
-import { useGetCart, getGetCartQueryKey, useUpdateCartItem, useRemoveFromCart, useCheckoutCart } from "@workspace/api-client-react";
+import {
+  useGetCart, getGetCartQueryKey,
+  useUpdateCartItem, useRemoveFromCart, useCheckoutCart,
+  useGetLastShippingInfo, getGetLastShippingInfoQueryKey,
+} from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +25,9 @@ export default function Cart() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const { data: lastShippingInfo } = useGetLastShippingInfo({
+    query: { queryKey: getGetLastShippingInfoQueryKey(), enabled: !!user },
+  });
 
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -34,6 +41,22 @@ export default function Cart() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  const applyRememberedValue = (
+    field: "name" | "address" | "phone",
+    currentValue: string,
+    setValue: (v: string) => void
+  ) => {
+    if (currentValue.trim() || !lastShippingInfo) return;
+    const remembered =
+      field === "name" ? lastShippingInfo.customerName
+      : field === "address" ? lastShippingInfo.shippingAddress
+      : lastShippingInfo.phoneNumber;
+    if (remembered) {
+      setValue(remembered);
+      toast({ title: "Filled in from your last order" });
+    }
+  };
 
   const handleUpdateQuantity = (productId: number, quantity: number) => {
     updateItem.mutate({ productId, data: { quantity } }, {
@@ -194,8 +217,10 @@ export default function Cart() {
                     <Input
                       id="name"
                       required
+                      placeholder={lastShippingInfo?.customerName ?? undefined}
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      onFocus={() => applyRememberedValue("name", name, setName)}
                     />
                   </div>
                   <div className="space-y-2">
@@ -204,10 +229,11 @@ export default function Cart() {
                     </Label>
                     <Textarea
                       id="address"
-                      placeholder="Full Address"
+                      placeholder={lastShippingInfo?.shippingAddress ?? "Full Address"}
                       required
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
+                      onFocus={() => applyRememberedValue("address", address, setAddress)}
                     />
                   </div>
                   <div className="space-y-2">
@@ -218,8 +244,10 @@ export default function Cart() {
                       id="phone"
                       type="tel"
                       required
+                      placeholder={lastShippingInfo?.phoneNumber ?? undefined}
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
+                      onFocus={() => applyRememberedValue("phone", phone, setPhone)}
                     />
                   </div>
                   <div className="space-y-2">

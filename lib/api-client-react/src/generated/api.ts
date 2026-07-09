@@ -31,6 +31,7 @@ import type {
   ErrorEnvelope,
   HandleBrowserLoginCallbackParams,
   HealthStatus,
+  LastShippingInfo,
   ListCustomersParams,
   ListOrdersParams,
   ListProductsParams,
@@ -1415,6 +1416,83 @@ export function useListOrders<TData = Awaited<ReturnType<typeof listOrders>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListOrdersQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetLastShippingInfoUrl = () => {
+
+
+
+
+  return `/api/orders/last-shipping-info`
+}
+
+/**
+ * @summary Get the current customer's most recently used shipping info, for prefilling checkout
+ */
+export const getLastShippingInfo = async ( options?: RequestInit): Promise<LastShippingInfo> => {
+
+  return customFetch<LastShippingInfo>(getGetLastShippingInfoUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLastShippingInfoQueryKey = () => {
+    return [
+    `/api/orders/last-shipping-info`
+    ] as const;
+    }
+
+
+export const getGetLastShippingInfoQueryOptions = <TData = Awaited<ReturnType<typeof getLastShippingInfo>>, TError = ErrorType<ErrorEnvelope>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLastShippingInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLastShippingInfoQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLastShippingInfo>>> = ({ signal }) => getLastShippingInfo({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLastShippingInfo>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetLastShippingInfoQueryResult = NonNullable<Awaited<ReturnType<typeof getLastShippingInfo>>>
+export type GetLastShippingInfoQueryError = ErrorType<ErrorEnvelope>
+
+
+/**
+ * @summary Get the current customer's most recently used shipping info, for prefilling checkout
+ */
+
+export function useGetLastShippingInfo<TData = Awaited<ReturnType<typeof getLastShippingInfo>>, TError = ErrorType<ErrorEnvelope>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLastShippingInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetLastShippingInfoQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

@@ -20,6 +20,7 @@ export * from './dashboardStats';
 export * from './errorEnvelope';
 export * from './handleBrowserLoginCallbackParams';
 export * from './healthStatus';
+export * from './lastShippingInfo';
 export * from './listCustomersParams';
 export * from './listOrdersParams';
 export * from './listProductsParams';

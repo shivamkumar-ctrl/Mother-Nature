@@ -475,6 +475,16 @@ export const ListOrdersResponse = zod.array(ListOrdersResponseItem)
 
 
 /**
+ * @summary Get the current customer's most recently used shipping info, for prefilling checkout
+ */
+export const GetLastShippingInfoResponse = zod.object({
+  "customerName": zod.string().nullish(),
+  "shippingAddress": zod.string().nullish(),
+  "phoneNumber": zod.string().nullish()
+})
+
+
+/**
  * @summary Get order details
  */
 export const GetOrderParams = zod.object({
