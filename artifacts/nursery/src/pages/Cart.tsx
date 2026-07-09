@@ -216,6 +216,8 @@ export default function Cart() {
                     </Label>
                     <Input
                       id="name"
+                      name="fullName"
+                      autoComplete="off"
                       required
                       placeholder={lastShippingInfo?.customerName ?? undefined}
                       value={name}
@@ -229,6 +231,8 @@ export default function Cart() {
                     </Label>
                     <Textarea
                       id="address"
+                      name="shippingAddressInput"
+                      autoComplete="off"
                       placeholder={lastShippingInfo?.shippingAddress ?? "Full Address"}
                       required
                       value={address}
@@ -242,7 +246,9 @@ export default function Cart() {
                     </Label>
                     <Input
                       id="phone"
+                      name="mobileNumberInput"
                       type="tel"
+                      autoComplete="off"
                       required
                       placeholder={lastShippingInfo?.phoneNumber ?? undefined}
                       value={phone}
