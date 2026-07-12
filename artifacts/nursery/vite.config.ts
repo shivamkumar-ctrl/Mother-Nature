@@ -4,27 +4,22 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
+// During `vite build` Railway does not inject PORT/BASE_PATH — these are
+// only needed when running the dev/preview server. Fall back to defaults
+// so the production build can complete, and only validate PORT when one
+// is actually provided.
 const rawPort = process.env.PORT;
 
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
+if (rawPort !== undefined) {
+  const parsed = Number(rawPort);
+  if (Number.isNaN(parsed) || parsed <= 0) {
+    throw new Error(`Invalid PORT value: "${rawPort}"`);
+  }
 }
 
-const port = Number(rawPort);
+const port = rawPort !== undefined ? Number(rawPort) : 5173;
 
-if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${rawPort}"`);
-}
-
-const basePath = process.env.BASE_PATH;
-
-if (!basePath) {
-  throw new Error(
-    "BASE_PATH environment variable is required but was not provided.",
-  );
-}
+const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig({
   base: basePath,
