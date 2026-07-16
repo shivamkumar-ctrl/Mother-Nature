@@ -160,7 +160,7 @@ export default function Shop() {
                 </Button>
               </div>
             ) : (
-              products?.map((product) => {
+              (Array.isArray(products) ? products : products?.products || products?.data || []).map((product) => {
                 const bareSearch = searchStr.startsWith("?") ? searchStr.slice(1) : searchStr;
                 const productHref = `/product/${product.id}${bareSearch ? `?from=${encodeURIComponent(bareSearch)}` : ""}`;
                 return (
