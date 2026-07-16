@@ -89,8 +89,8 @@ export default function Home() {
                   <Skeleton className="h-5 w-1/3" />
                 </div>
               ))
-            ) : products?.slice(0, 4).map((product) => (
-              <Link key={product.id} href={`/product/${product.id}`} className="group block">
+            ) : (Array.isArray(products) ? products : products?.products || products?.data || []).slice(0, 4).map((product) => (
+  <Link key={product.id} href={`/product/${product.id}`} className="group block">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-muted mb-4 shadow-sm group-hover:shadow-md transition-all">
                   {product.imageUrl ? (
                     <img 
